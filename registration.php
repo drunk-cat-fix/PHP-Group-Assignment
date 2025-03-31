@@ -96,13 +96,13 @@
 
 <div class="register-container">
     <h2>User Registration</h2>
-    <form action="registration.php" method="post" enctype="multipart/form-data">
+    <form action="service/ControllerForRegistration.php" method="post" enctype="multipart/form-data">
 <!--        <input type="text" id="name" placeholder="Full Name" required>-->
         <input type="text" id="username" placeholder="Username" required>
         <input type="email" id="email" placeholder="Email" required>
         <input type="password" id="password" placeholder="Password" required>
 
-        <select id="role">
+        <select id="role" name="role">
             <option value="">Select Role</option>
             <option value="vendor">Vendor</option>
             <option value="customer">Customer</option>
