@@ -1,6 +1,6 @@
 <?php
 
-function getConnection(): PDO
+    function getConnection(): PDO
     {
         $connection = null;
         try {

@@ -96,21 +96,22 @@
 
 <div class="register-container">
     <h2>User Registration</h2>
-    <form action="service/ControllerForRegistration.php" method="post" enctype="multipart/form-data">
+    <form action="service/AdminRegistration.php" method="post" enctype="multipart/form-data">
 <!--        <input type="text" id="name" placeholder="Full Name" required>-->
-        <input type="text" id="username" placeholder="Username" required>
-        <input type="email" id="email" placeholder="Email" required>
-        <input type="password" id="password" placeholder="Password" required>
+        <input type="text" id="username" name="username" placeholder="Username" required>
+        <input type="email" id="email" name="email" placeholder="Email" required>
+        <input type="password" id="password" name="password" placeholder="Password" required>
 
         <select id="role" name="role">
             <option value="">Select Role</option>
-            <option value="vendor">Vendor</option>
-            <option value="customer">Customer</option>
-            <option value="staff">Staff</option>
+            <option value="Admin">Admin</option>
+            <option value="Vendor">Vendor</option>
+            <option value="Customer">Customer</option>
+            <option value="Staff">Staff</option>
         </select>
 
         <label for="profile">Upload Profile Picture</label>
-        <input type="file" id="profile" accept=".jpeg, .png, .jpg, .bmp" onchange="previewProfile()">
+        <input type="file" id="profile" name="profile" accept=".jpeg, .png, .jpg, .bmp" onchange="previewProfile()">
         <img id="profile-preview" src="" alt="Profile Preview">
 
         <button type="submit" onclick="return validateForm()">Register</button>

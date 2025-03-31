@@ -104,53 +104,21 @@ session_start();
 
 <div class="login-container">
     <h2>Login</h2>
-    <form id="loginForm" action="login.php" method="post">
-        <input type="text" id="username" placeholder="Enter Username" required>
-        <input type="password" id="password" placeholder="Enter Password" required>
-        <select id="role">
+    <form id="loginForm" action="service/AdminLogin.php" method="POST">
+        <input type="text" id="username" name="username" placeholder="Enter Username" required>
+        <input type="password" id="password" name="password" placeholder="Enter Password" required>
+        <select id="role" name="roles">
             <option value="">Select Role</option>
             <option value="admin">Admin</option>
             <option value="vendor">Vendor</option>
             <option value="customer">Customer</option>
             <option value="staff">Staff</option>
         </select>
-        <button type="submit" onclick="return login()">Login</button>
+        <div style="color: red;" > <span id="prompt"><?= $_GET["errMsg"] ?></span></div>
+        <button type="submit">Login</button>
     </form>
 </div>
 
-<script>
-    function login() {
-        var username = document.getElementById("username");
-        var password = document.getElementById("password");
-        var role = document.getElementById("role");
-
-        if (username.value === "" || password.value === "" || role.value === "") {
-            alert("❗ Please fill in all fields.");
-            return false;
-        }
-
-        if (username.value === "admin" && password.value === "admin123" && role.value === "admin") {
-            window.location.href = "admin_dashboard.html";
-        } else if (username.value === "vendor" && password.value === "vendor123" && role.value === "vendor") {
-            window.location.href = "vendor_dashboard.html";
-        } else if (username.value === "customer" && password.value === "customer123" && role.value === "customer") {
-            window.location.href = "customer_dashboard.html";
-        } else if (username.value === "staff" && password.value === "staff123" && role.value === "staff") {
-            window.location.href = "staff_dashboard.html";
-        } else {
-            showError(username);
-            showError(password);
-            showError(role);
-            alert("❌ Invalid credentials or role.");
-            return false;
-        }
-    }
-
-    function showError(element) {
-        element.classList.add("error");
-        setTimeout(() => element.classList.remove("error"), 1000);
-    }
-</script>
 
 </body>
 </html>
