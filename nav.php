@@ -206,7 +206,7 @@ $mimeType = getImageMimeType($avatarData);
 </div>
 
 <form action="nav.php" method="post" style="text-align: center; margin-top: 20px;">
-    <button type="submit" class="logout-btn">Logout</button>
+    <a href="login.php" type="submit" class="logout-btn">Logout</a>
 </form>
 <div id="previewModal" class="modal">
     <div class="modal-content">
