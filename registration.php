@@ -96,7 +96,7 @@
 
 <div class="register-container">
     <h2>User Registration</h2>
-    <form action="service/AdminRegistration.php" method="post" enctype="multipart/form-data">
+    <form action="service/Registration.php" method="post" enctype="multipart/form-data">
 <!--        <input type="text" id="name" placeholder="Full Name" required>-->
         <input type="text" id="username" name="username" placeholder="Username" required>
         <input type="email" id="email" name="email" placeholder="Email" required>

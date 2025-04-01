@@ -9,6 +9,23 @@ class Staff
     private $staff_name;
     private $staff_email;
     private $staff_address;
+    private $staff_profile;
+
+    /**
+     * @return mixed
+     */
+    public function getStaffProfile()
+    {
+        return $this->staff_profile;
+    }
+
+    /**
+     * @param mixed $staff_profile
+     */
+    public function setStaffProfile($staff_profile): void
+    {
+        $this->staff_profile = $staff_profile;
+    }
 
     /**
      * @return mixed

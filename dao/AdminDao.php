@@ -101,6 +101,19 @@ class AdminDao
 
     }
 
+    function updateProfileForAdmin(Admin $admin): int{
+        $sql = "update admin set admin_profile =? where admin_id=? ";
+        $conn = getConnection();
+        $stmt = $conn->prepare($sql);
+        $adminProfile = $admin->getAdminProfile();
+        $stmt->bindParam(1, $adminProfile, PDO::PARAM_STR);
+        $adminId = $admin->getAdminId();
+        $stmt->bindParam(2, $adminId, PDO::PARAM_INT);
+        if ($stmt->execute()) {
+            return $stmt->rowCount();
+        }
+        return 0;
+    }
 
 
 

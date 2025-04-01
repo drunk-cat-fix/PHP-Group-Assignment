@@ -104,7 +104,7 @@ session_start();
 
 <div class="login-container">
     <h2>Login</h2>
-    <form id="loginForm" action="service/AdminLogin.php" method="POST">
+    <form id="loginForm" action="service/Login.php" method="POST">
         <input type="text" id="username" name="username" placeholder="Enter Username" required>
         <input type="password" id="password" name="password" placeholder="Enter Password" required>
         <select id="role" name="roles">

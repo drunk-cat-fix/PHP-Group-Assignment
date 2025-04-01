@@ -7,6 +7,12 @@ use entities\Vendor;
 
 require_once '../entities/Admin.php';
 require_once '../dao/AdminDAO.php';
+require_once '../dao/CustomerDao.php';
+require_once '../entities/Customer.php';
+require_once '../dao/StaffDao.php';
+require_once '../entities/Staff.php';
+require_once '../dao/VendorDao.php';
+require_once '../entities/Vendor.php';
 
 if ($_POST) {
     $role = $_POST['roles'];
@@ -16,6 +22,12 @@ if ($_POST) {
         $vendor->setVendorName($_POST['username']);
         $vendor->setVendorEmail($_POST['email']);
         $vendor->setVendorPw($_POST['password']);
+        $vendorDao = new VendorDao();
+        if ($vendorDao->isExisted($vendor->getVendorName(),$vendor->getVendorPw())) {
+            header('Location: ../index.php');
+        }else{
+            header('Location: ../login.php?errMsg=Invalid username or password!');
+        }
     }
 
     if ($role == 'customer') {
@@ -23,6 +35,12 @@ if ($_POST) {
         $customer->setCustomerName($_POST['username']);
         $customer->setCustomerEmail($_POST['email']);
         $customer->setCustomerPw($_POST['password']);
+        $customerDao = new CustomerDao();
+        if ($customerDao->isExisted($customer->getCustomerName(),$customer->getCustomerPw())) {
+            header("location: ../index.php");
+        }else{
+            header("location: ../login.php?errMsg=Invalid username or password!");
+        }
     }
 
     if ($role == 'staff') {
@@ -30,6 +48,13 @@ if ($_POST) {
         $staff->setStaffName($_POST['username']);
         $staff->setStaffEmail($_POST['email']);
         $staff->setStaffPw($_POST['password']);
+
+        $staffDao = new StaffDao();
+        if ($staffDao->isExisted($staff->getStaffName(),$staff->getStaffPw())) {
+            header("location: ../index.php");
+        }else{
+            header("location: ../login.php?errMsg=Invalid username or password!");
+        }
     }
 
     if ($role == 'admin') {
@@ -42,7 +67,7 @@ if ($_POST) {
         if ($status) {
             header("location: ../index.php");
         } else {
-            header("location: ../login.php?errMsg=Invalid username or password");
+            header("location: ../login.php?errMsg=Invalid username or password!");
         }
 
     }
