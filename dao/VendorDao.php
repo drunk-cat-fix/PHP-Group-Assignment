@@ -80,18 +80,29 @@ class VendorDao {
 
     public function isExisted($uName,$uPwd): bool
     {
-        $sql = "SELECT vendor_name, vendor_pw FROM vendor WHERE vendor_name = :uName";
+        $sql = "SELECT vendor_id,vendor_name, vendor_pw FROM vendor WHERE vendor_name = :uName";
         $stmt = getConnection()->prepare($sql);
         $stmt->bindParam(":uName", $uName);
         $stmt->execute();
         $vendor = $stmt->fetch();
 //        var_dump($vendor&&password_verify($uPwd, $vendor->getVendorPw()));
         if ($vendor&&password_verify($uPwd, $vendor['vendor_pw'])) {
+            $_SESSION['vendor_id'] = $vendor['vendor_id'];
             return true;
         }
         return false;
     }
 
+    public function loadProfileForVendor($vendorId)
+    {
+        $sql = "SELECT vendor_profile FROM vendors WHERE vendor_id = :id";
+        $stmt = getConnection()->prepare($sql);
+        $stmt->bindParam(":id", $vendorId);
+        $stmt->execute();
+        $profile = $stmt->fetch(PDO::FETCH_ASSOC);
+        $profile->setVendorProfile($profile['vendor_profile']);
+        return $profile;
+    }
 
 
 

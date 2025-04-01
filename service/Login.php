@@ -1,12 +1,12 @@
 <?php
-
+session_start();
 use entities\Admin;
 use entities\Customer;
 use entities\Staff;
 use entities\Vendor;
 
 require_once '../entities/Admin.php';
-require_once '../dao/AdminDAO.php';
+require_once '../dao/AdminDao.php';
 require_once '../dao/CustomerDao.php';
 require_once '../entities/Customer.php';
 require_once '../dao/StaffDao.php';
@@ -16,7 +16,6 @@ require_once '../entities/Vendor.php';
 
 if ($_POST) {
     $role = $_POST['roles'];
-//    print_r($_POST);
     if ($role == 'vendor') {
         $vendor = new Vendor();
         $vendor->setVendorName($_POST['username']);
@@ -24,6 +23,7 @@ if ($_POST) {
         $vendor->setVendorPw($_POST['password']);
         $vendorDao = new VendorDao();
         if ($vendorDao->isExisted($vendor->getVendorName(),$vendor->getVendorPw())) {
+
             header('Location: ../index.php');
         }else{
             header('Location: ../login.php?errMsg=Invalid username or password!');

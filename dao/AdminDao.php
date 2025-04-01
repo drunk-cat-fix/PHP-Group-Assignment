@@ -2,7 +2,7 @@
 
 use entities\Admin;
 
-include_once "../Utilities/Connection.php";
+require_once "../Utilities/Connection.php";
 
 $conn = getConnection();
 
@@ -84,7 +84,7 @@ class AdminDao
     }
 
     function isExisted(Admin $admin): int{
-        $sql = "select admin_name, admin_pw from admin where admin_name = ? ";
+        $sql = "select admin_id,admin_name, admin_pw from admin where admin_name = ? ";
         $conn = getConnection();
         $stmt = $conn->prepare($sql);
         $adminName = $admin->getAdminName();
@@ -94,6 +94,7 @@ class AdminDao
         $stmt->execute();
         $adm = $stmt->fetch();
         if ($adm&&password_verify($admin->getAdminPw(), $adm["admin_pw"])) {
+            $_SESSION["admin_id"] = $adm["admin_id"];
             return $stmt->rowCount();
         }
         return 0;
@@ -115,6 +116,16 @@ class AdminDao
         return 0;
     }
 
+
+    public function loadProfileForAdmin($adminId) :Admin{
+        $sql = "select admin_name,admin_profile from admin where admin_id=?";
+        $conn = getConnection();
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$adminId]);
+        $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+        $admin->setAdminProfile($admin["admin_profile"]);
+        return $admin;
+    }
 
 
 }

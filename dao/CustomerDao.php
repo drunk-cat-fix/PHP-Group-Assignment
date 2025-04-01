@@ -2,7 +2,8 @@
 
 use entities\Customer;
 
-//require_once "entities/Customer.php";
+require_once "../entities/Customer.php";
+require_once "../Utilities/Connection.php";
 class CustomerDao {
     public function getAllCustomers() {
         $sql = "SELECT * FROM customers";
@@ -75,20 +76,40 @@ class CustomerDao {
     }
 
     public function isExisted($username,$pwd):bool{
-        $sql = " select customer_name, customer_pw from customer where customer_name = :name ";
+        $sql = " select customer_id, customer_name, customer_pw from customer where customer_name = :name ";
         $stmt = getConnection()->prepare($sql);
         $stmt->bindParam(":name", $username);
         $stmt->execute();
         $row = $stmt->fetch();
         if($row&&password_verify($pwd,$row["customer_pw"])){
+            $_SESSION["customer_id"] = $row["customer_id"];
+//            echo $_SESSION["customer_id"];
             return true;
         }
         return false;
+    }
 
+    public function loadProfileForCustomer($customer_id):Customer {
+        $sql = "SELECT customer_profile FROM customer WHERE customer_id = :id ";
+        $stmt = getConnection()->prepare($sql);
+        $stmt->bindParam(":id", $customer_id);
+        $stmt->execute();
+        $customer= $stmt->fetch(PDO::FETCH_ASSOC);
+        $customer->setCustomerProfile($customer["customer_profile"]);
+        return $customer;
+    }
 
+    public function getImageMimeType($binaryData) {
+        if (empty($binaryData)) return 'image/jpeg';
 
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->buffer($binaryData);
+
+        // 只允许常见图片类型
+        $allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        return in_array($mimeType, $allowed) ? $mimeType : 'image/jpeg';
     }
 
 
-
 }
+

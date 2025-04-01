@@ -106,14 +106,24 @@ class StaffDao {
      * @return bool
      */
     public function isExisted($uName,$uPwd){
-        $sql = "SELECT staff_name,staff_pw FROM staff WHERE staff_name = ?";
+        $sql = "SELECT staff_id,staff_name,staff_pw FROM staff WHERE staff_name = ?";
         $stmt = getConnection()->prepare($sql);
         $stmt->execute([$uName]);
         $row= $stmt->fetch();
         if($row&&password_verify($uPwd, $row['staff_pw'])){
+            $_SESSION['staff_id'] = $row['staff_id'];
             return true;
         }
         return false;
+    }
+
+    public function loadProfileForStaff($staffId){
+        $sql = "SELECT staff_profile FROM staff WHERE staff_id = ?";
+        $stmt = getConnection()->prepare($sql);
+        $stmt->execute([$staffId]);
+        $staff=$stmt->fetch(PDO::FETCH_ASSOC);
+        $staff->setStaffProfile($staff['staff_profile']);
+        return $staff;
     }
 
 
