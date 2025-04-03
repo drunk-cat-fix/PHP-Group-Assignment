@@ -1,8 +1,8 @@
 <?php
 use entities\Admin;
-require_once __DIR__ . '\..\entities\Admin.php';
-require_once __DIR__ . '\..\dao\AdminDao.php';
-require_once __DIR__ . "\..\Utilities\Connection.php";
+require_once __DIR__ . '/../entities\Admin.php';
+require_once __DIR__ . '/../dao\AdminDao.php';
+require_once __DIR__ . "/../Utilities/Connection.php";
 
 
 $task_id = isset($_GET['task_id']) ? intval($_GET['task_id']) : (isset($_POST['task_id']) ? intval($_POST['task_id']) : 0);

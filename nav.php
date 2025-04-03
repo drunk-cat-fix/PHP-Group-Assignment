@@ -183,6 +183,13 @@ $mimeType = getImageMimeType($avatarData);
         <a href="#" class="nav-item">Others</a>
     </div>
 
+    <div class="dropdown">
+        <a href="customer_order_history.php" class="nav-item">Order History</a>
+    </div>
+
+    <div class="dropdown">
+        <a href="customer_preferences.php" class="nav-item">Preferences</a>
+    </div>
 
 
 

@@ -2,7 +2,7 @@
 
 use entities\Admin;
 
-require_once __DIR__ . "\..\Utilities\Connection.php";
+require_once __DIR__ . "/../Utilities/Connection.php";
 
 $conn = getConnection();
 
