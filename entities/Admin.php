@@ -12,6 +12,13 @@ class Admin
     private $admin_city;
     private $admin_profile;
     private $admin_status;
+    private $task_id;
+    private $task_name;
+    private $task_desc;
+    private $task_start_date;
+    private $task_due_date;
+    private $assigned_staff;
+    private $staff_id;
 
     /**
      * @return mixed
@@ -139,6 +146,76 @@ class Admin
     public function setAdminStatus($admin_status)
     {
         $this->admin_status = $admin_status;
+    }
+
+    public function getTaskID()
+    {
+        return $this->task_id;
+    }
+
+    public function setTaskID($task_id)
+    {
+        $this->task_id = $task_id;
+    }
+
+    public function getTaskName()
+    {
+        return $this->task_name;
+    }
+
+    public function setTaskName($task_name)
+    {
+        $this->task_name = $task_name;
+    }
+
+    public function getTaskDesc()
+    {
+        return $this->task_desc;
+    }
+
+    public function setTaskDesc($task_desc)
+    {
+        $this->task_desc = $task_desc;
+    }
+
+    public function getTaskStartDate()
+    {
+        return $this->task_start_date;
+    }
+
+    public function setTaskStartDate($task_start_date)
+    {
+        $this->task_start_date = $task_start_date;
+    }
+
+    public function getTaskDueDate()
+    {
+        return $this->task_due_date;
+    }
+
+    public function setTaskDueDate($task_due_date)
+    {
+        $this->task_due_date = $task_due_date;
+    }
+
+    public function getAssignedStaff()
+    {
+        return $this->assigned_staff;
+    }
+
+    public function setAssignedStaff(array $assigned_staff)
+    {
+        $this->assigned_staff = $assigned_staff;
+    }
+
+    public function setStaffID($staff_id)
+    {
+        $this->staff_id = $staff_id;
+    }
+
+    public function getStaffID()
+    {
+        return $this->staff_id;
     }
 
 

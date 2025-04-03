@@ -2,7 +2,7 @@
 
 use entities\Admin;
 
-require_once "../Utilities/Connection.php";
+require_once __DIR__ . "\..\Utilities\Connection.php";
 
 $conn = getConnection();
 
@@ -125,6 +125,140 @@ class AdminDao
         $admin = $stmt->fetch(PDO::FETCH_ASSOC);
         $admin->setAdminProfile($admin["admin_profile"]);
         return $admin;
+    }
+
+    public function addTask(Admin $admin)
+    {
+        $conn = getConnection();  
+        $taskName = $admin->getTaskName();
+        $taskDesc = $admin->getTaskDesc();
+        $taskStartDate = $admin->getTaskStartDate();
+        $taskDueDate = $admin->getTaskDueDate();
+
+        // Extract Order ID if task name contains "#1234"
+        $orderID = null;
+        if (preg_match('/#(\d+)/', $taskName, $matches)) {
+            $orderID = $matches[1]; // Extracts the number after #
+        }
+
+        try {
+            $conn->beginTransaction();
+        
+            if ($orderID) {
+                $sql = "INSERT INTO task (task_name, task_desc, task_start_date, task_due_date, order_id) 
+                        VALUES (?, ?, ?, ?, ?)";
+                $stmt = $conn->prepare($sql);
+                $stmt->execute([$taskName, $taskDesc, $taskStartDate, $taskDueDate, $orderID]);
+                $this->changeDeliverStatus($orderID, $conn);
+            } else {
+                $sql = "INSERT INTO task (task_name, task_desc, task_start_date, task_due_date) 
+                        VALUES (?, ?, ?, ?)";
+                $stmt = $conn->prepare($sql);
+                $stmt->execute([$taskName, $taskDesc, $taskStartDate, $taskDueDate]);
+            }
+
+            $taskID = $this->getLatestTaskId();
+            $assignedStaffs = $admin->getAssignedStaff();
+        
+            $result = $this->assignTask($taskID, $assignedStaffs);
+        
+            $conn->commit();
+            return $result;
+        } catch (Exception $e) {
+            $conn->rollBack();
+            return false;
+        }
+    }
+
+    public function editTask(Admin $admin)
+    {
+        $conn = getConnection();
+        $taskID = $admin->getTaskID();
+        $taskName = $admin->getTaskName();
+        $taskDesc = $admin->getTaskDesc();
+        $taskStartDate = $admin->getTaskStartDate();
+        $taskDueDate = $admin->getTaskDueDate();
+    
+        try {
+            $conn->beginTransaction();
+
+            // Update the task details
+            $sql = "UPDATE task 
+                    SET task_name = ?, task_desc = ?, task_start_date = ?, task_due_date = ? 
+                    WHERE task_id = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([$taskName, $taskDesc, $taskStartDate, $taskDueDate, $taskID]);
+
+            // Delete existing staff_task assignments for this task
+            $sql = "DELETE FROM staff_task WHERE task_id = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([$taskID]);
+
+            // Insert new staff_task assignments
+            $assignedStaffs = $admin->getAssignedStaff();
+            foreach ($assignedStaffs as $staffID) {
+                $sql = "INSERT INTO staff_task (staff_id, task_id) VALUES (?, ?)";
+                $stmt = $conn->prepare($sql);
+                $stmt->execute([$staffID, $taskID]);
+            }
+
+            $conn->commit();
+            return true;
+        } catch (Exception $e) {
+            $conn->rollBack();
+            return false;
+        }
+    }
+
+    public function assignTask($taskID, $assignedStaffs)
+    {
+        if (!$taskID || empty($assignedStaffs)) {
+            return false;
+        }
+    
+        $conn = getConnection();  
+        $sql = "INSERT INTO staff_task (staff_id, task_id) VALUES (?, ?)";
+        $stmt = $conn->prepare($sql);
+
+        foreach ($assignedStaffs as $staffId) {
+            $stmt->execute([$staffId, $taskID]);
+        }
+        
+        return true;
+    }
+
+    public function changeDeliverStatus($orderID, $conn = null)
+    {
+        if ($conn === null) {
+            $conn = getConnection();
+        }
+    
+        $sql = "UPDATE customer_order SET deliver_status = 'In Progress' WHERE order_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$orderID]);
+    }
+
+    public function getLatestTaskId()
+    {
+        $conn = getConnection();
+        $sql = "SELECT MAX(task_id) as latest_id FROM task";
+        $stmt = $conn->query($sql);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ? $row['latest_id'] : null;
+    }
+
+    public function removeStaff(Admin $admin)
+    {
+        $sql = "DELETE FROM staff WHERE staff_id = ?";
+        $conn = getConnection();
+        $stmt = $conn->prepare($sql);
+        $staffID = $admin->getStaffID();
+        if ($stmt->execute([$staffID])) {
+            header("Location: ../admin_dashboard.php?msg=Staff removed successfully");
+            exit();
+        } else {
+            echo "<p style='color: red;'>Failed to remove staff.</p>";
+        }
     }
 
 
