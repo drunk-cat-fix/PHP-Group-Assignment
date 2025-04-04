@@ -50,9 +50,20 @@ if ($_POST) {
         $staff->setStaffPw($_POST['password']);
 
         $staffDao = new StaffDao();
-        if ($staffDao->isExisted($staff->getStaffName(),$staff->getStaffPw())) {
-            header("location: ../index.php");
-        }else{
+        $staffData = $staffDao->isExisted($staff->getStaffName(), $staff->getStaffPw());
+
+        if ($staffData) {
+            $_SESSION['staff_id'] = $staffData['staff_id'];
+            ?>
+            <form id="redirectForm" action="../staff_dashboard.php" method="post">
+                <input type="hidden" name="staff_id" value="<?php echo $staffData['staff_id']; ?>">
+            </form>
+            <script>
+                document.getElementById('redirectForm').submit();
+            </script>
+            <?php
+            exit();
+        } else {
             header("location: ../login.php?errMsg=Invalid username or password!");
         }
     }

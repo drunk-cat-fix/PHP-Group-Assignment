@@ -1,5 +1,7 @@
 <?php
-require_once "Utilities/Connection.php";
+require_once __DIR__ . '\..\entities\Admin.php';
+require_once __DIR__ . '\..\dao\AdminDao.php';
+require_once __DIR__ . '\..\Utilities\Connection.php';
 
 if (!isset($_GET['task_id']) || empty($_GET['task_id'])) {
     die("Task ID is required.");

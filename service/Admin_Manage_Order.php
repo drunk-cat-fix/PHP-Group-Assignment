@@ -1,5 +1,7 @@
 <?php
-require_once 'Utilities/Connection.php';
+require_once __DIR__ . '\..\entities\Admin.php';
+require_once __DIR__ . '\..\dao\AdminDao.php';
+require_once __DIR__ . '\..\Utilities\Connection.php';
 
 $conn = getConnection();
 

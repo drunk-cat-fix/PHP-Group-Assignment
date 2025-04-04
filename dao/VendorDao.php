@@ -1,5 +1,9 @@
 <?php
+
+use entities\Vendor;
+
 class VendorDao {
+
     /**
      * @return array
      */
@@ -104,7 +108,176 @@ class VendorDao {
         return $profile;
     }
 
+    public function addProduct($vendor)
+    {
+        $sql = "INSERT INTO product (product_name, product_desc, product_category, product_qty, product_packaging, product_price, product_vendor, product_profile) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        $productName = $vendor->getProductName();
+        $productDesc = $vendor->getProductDesc();
+        $productCategory = $vendor->getProductCategory();
+        $quantity = $vendor->getQuantity();
+        $productPackaging = $vendor->getProductPackaging();
+        $price = $vendor->getPrice();
+        $vendor_id = 3;
+        $productProfile = $vendor->getProductProfile();        
+        $stmt = getConnection()->prepare($sql);
+        return $stmt->execute([$productName, $productDesc, $productCategory, $quantity, $productPackaging, $price, $vendor_id, $productProfile]);
+    }
 
+    public function updateQuantity(Vendor $vendor) {
+        try {
+            $conn = getConnection();
+        
+            // Double-check that we have necessary values
+            $productId = $vendor->getProductID();
+            $quantity = $vendor->getQuantity();
+        
+            if (empty($productId) || $quantity === null) {
+                error_log("Missing required data for updateQuantity: product_id=" . 
+                          $productId . ", quantity=" . $quantity);
+                return false;
+            }
+        
+            // Make sure we're updating to the new quantity value, not reducing by that amount
+            $sql = "UPDATE product SET product_qty = :qty WHERE product_id = :id";
+            $stmt = $conn->prepare($sql);
+        
+            error_log("Updating product ID: " . $productId . " with new quantity: " . $quantity);
+        
+            $stmt->bindParam(':id', $productId, PDO::PARAM_INT);
+            $stmt->bindParam(':qty', $quantity, PDO::PARAM_INT);
+        
+            $result = $stmt->execute();
+        
+            if (!$result) {
+                error_log("SQL error: " . implode(" ", $stmt->errorInfo()));
+            } else {
+                error_log("Rows affected: " . $stmt->rowCount());
+                if ($stmt->rowCount() == 0) {
+                    error_log("No rows updated. Check if product ID exists: " . $productId);
+                }
+            }
+        
+            return $result;
+        } catch (\PDOException $e) {
+            error_log("Database error in updateQuantity: " . $e->getMessage());
+            return false;
+        }
+    }
 
+    public function updateOrderStatus(Vendor $vendor)
+    {
+        $conn = getConnection();
+        $updateStatusSql = "UPDATE order_product SET status = 'Complete' WHERE order_id = :order_id";
+        $updateStmt = $conn->prepare($updateStatusSql);
+        $updateStmt->bindValue(':order_id', $vendor->getOrderID(), PDO::PARAM_INT);
+        $updateResult = $updateStmt->execute();
+    }
+
+    public function selectProductsInOrder($vendor)
+    {
+        $conn = getConnection();
+        $productsSql = "SELECT op.product_id, op.qty FROM order_product op 
+                    JOIN product p ON op.product_id = p.product_id 
+                    WHERE op.order_id = :order_id AND p.product_vendor = :vendor_id";
+        $productsStmt = $conn->prepare($productsSql);
+        $productsStmt->bindValue(':order_id', $vendor->getOrderID(), PDO::PARAM_INT);
+        $productsStmt->bindValue(':vendor_id', $vendor->getId(), PDO::PARAM_INT);
+        $productsStmt->execute();
+        $products = $productsStmt->fetchAll(PDO::FETCH_ASSOC);
+        $vendor->setProducts($products);
+    }
+
+    public function calculateQuantity(Vendor $vendor)
+    {
+        $conn = getConnection();
+        $products = $vendor->getProducts();
+        foreach($products as $product) {
+            $product_id = $product['product_id'];
+            $order_quantity = $product['qty']; // Changed from 'quantity' to 'qty'                
+            
+            // Get current quantity
+            $currentQtySql = "SELECT product_qty FROM product WHERE product_id = :product_id";
+            $currentQtyStmt = $conn->prepare($currentQtySql);
+            $currentQtyStmt->bindValue(':product_id', $product_id, PDO::PARAM_INT);
+            $currentQtyStmt->execute();
+            $currentQtyRow = $currentQtyStmt->fetch(PDO::FETCH_ASSOC);
+                    
+            $currentQty = $currentQtyRow['product_qty'];
+                        
+            // Calculate new quantity
+            $newQty = $currentQty - $order_quantity;
+
+            $vendor->setProductID($product_id);
+            $vendor->setQuantity($newQty);
+            $updateResult = $this->updateQuantity($vendor);
+        }
+    }
+
+    public function editProduct(Vendor $vendor) {
+        $conn = getConnection();
+        $sql = "UPDATE product SET product_name = :name, product_desc = :desc, product_category = :category, product_qty = :qty, product_packaging = :packaging, 
+            product_price = :price, product_profile = :profile WHERE product_id = :product_id";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bindValue(':name', $vendor->getProductName());
+        $stmt->bindValue(':desc', $vendor->getProductDesc());
+        $stmt->bindValue(':category', $vendor->getProductCategory());
+        $stmt->bindValue(':qty', $vendor->getQuantity());
+        $stmt->bindValue(':packaging', $vendor->getProductPackaging());
+        $stmt->bindValue(':price', $vendor->getPrice());
+        $stmt->bindValue(':profile', $vendor->getProductProfile(), PDO::PARAM_LOB);
+        $stmt->bindValue(':product_id', $vendor->getProductID());
+
+        return $stmt->execute();
+    }
+
+    public function denyOrder(Vendor $vendor, $reason) {
+        $conn = getConnection();
+
+        // Update status to 'Denied'
+        $sql = "UPDATE order_product SET status = 'Denied' WHERE order_id = :order_id";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindValue(':order_id', $vendor->getOrderID(), PDO::PARAM_INT);
+        $stmt->execute();
+
+        // Optionally log the reason in another table or in the same table (if you have a column for it)
+        // Example if order_product has 'denial_reason' column:
+        /*
+        $sqlReason = "UPDATE order_product SET denial_reason = :reason WHERE order_id = :order_id";
+        $stmtReason = $conn->prepare($sqlReason);
+        $stmtReason->bindValue(':order_id', $vendor->getOrderID(), PDO::PARAM_INT);
+        $stmtReason->bindValue(':reason', $reason, PDO::PARAM_STR);
+        $stmtReason->execute();
+        */
+    }
+
+    public function addService($vendor)
+    {
+        $sql = "INSERT INTO service (service_name, service_desc, service_category, service_price, service_vendor, service_profile) VALUES (?, ?, ?, ?, ?, ?)";
+        $serviceName = $vendor->getServiceName();
+        $serviceDesc = $vendor->getServiceDesc();
+        $serviceCategory = $vendor->getServiceCategory();
+        $price = $vendor->getPrice();
+        $vendor_id = $vendor->getId();
+        $serviceProfile = $vendor->getServiceProfile();        
+        $stmt = getConnection()->prepare($sql);
+        return $stmt->execute([$serviceName, $serviceDesc, $serviceCategory, $price, $vendor_id, $serviceProfile]);
+    }
+
+    public function editService(Vendor $vendor) {
+        $conn = getConnection();
+        $sql = "UPDATE service SET service_name = :name, service_desc = :desc, service_category = :category,
+            service_price = :price, service_profile = :profile WHERE service_id = :service_id";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bindValue(':name', $vendor->getServiceName());
+        $stmt->bindValue(':desc', $vendor->getServiceDesc());
+        $stmt->bindValue(':category', $vendor->getServiceCategory());
+        $stmt->bindValue(':price', $vendor->getPrice());
+        $stmt->bindValue(':profile', $vendor->getServiceProfile(), PDO::PARAM_LOB);
+        $stmt->bindValue(':service_id', $vendor->getServiceID());
+
+        return $stmt->execute();
+    }
 
 }
