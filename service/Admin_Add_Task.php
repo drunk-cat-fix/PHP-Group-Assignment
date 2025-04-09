@@ -1,8 +1,8 @@
 <?php
 use entities\Admin;
-require_once __DIR__ . '\..\entities\Admin.php';
-require_once __DIR__ . '\..\dao\AdminDao.php';
-require_once __DIR__ . '\..\Utilities\Connection.php';
+require_once __DIR__ . '/../entities/Admin.php';
+require_once __DIR__ . '/../dao/AdminDao.php';
+require_once __DIR__ . '/../Utilities/Connection.php';
 
 $staffList = [];
 $conn = getConnection();

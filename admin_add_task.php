@@ -1,6 +1,6 @@
 ﻿<?php
 session_start();
-require_once __DIR__ . "/service/Admin_Add_Task.php";
+require_once 'service/Admin_Add_Task.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
