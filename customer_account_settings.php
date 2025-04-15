@@ -1,4 +1,6 @@
 <?php
+session_start();
+require_once 'service/Customer_Account_Settings.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -9,99 +11,92 @@
   <style>
     .was-validated .form-control:invalid, .form-control.is-invalid { border-color: #dc3545; }
     .was-validated .form-control:invalid:focus, .form-control.is-invalid:focus { box-shadow: none; }
+    img.rounded-circle { object-fit: cover; }
   </style>
 </head>
 <body>
   <div class="container mt-5">
     <h2>Customer Account Settings</h2>
-    <form id="customerForm" class="needs-validation" novalidate action="#" method="POST" enctype="multipart/form-data">
+
+    <?php if (!empty($error)): ?>
+      <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+    <?php elseif (!empty($success)): ?>
+      <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
+    <?php endif; ?>
+
+    <form id="customerForm" class="needs-validation" novalidate method="POST" enctype="multipart/form-data">
       <div class="form-group">
         <label for="customerName">Full Name</label>
-        <input type="text" class="form-control" id="customerName" name="full_name" placeholder="Enter your full name" required>
+        <input type="text" class="form-control" id="customerName" name="customer_name" value="<?= htmlspecialchars($customer['customer_name']) ?>" required>
         <div class="invalid-feedback">Please enter your full name.</div>
       </div>
+
       <div class="form-group">
-        <label for="customerEmail">Email Address</label>
-        <input type="email" class="form-control" id="customerEmail" name="email" placeholder="Enter your email" required>
-        <div class="invalid-feedback">Please enter a valid email address.</div>
-      </div>
-      <div class="form-group">
-        <label for="customerPassword">Password</label>
-        <input type="password" class="form-control" id="customerPassword" name="password" placeholder="Enter password" required>
-        <div class="invalid-feedback">Please enter a password.</div>
-      </div>
-      <div class="form-group">
-        <label for="customerConfirmPassword">Confirm Password</label>
-        <input type="password" class="form-control" id="customerConfirmPassword" name="confirm_password" placeholder="Re-enter password" required>
-        <div class="invalid-feedback">Passwords must match and cannot be empty.</div>
-      </div>
-      <div class="form-group">
-        <label for="customerPhone">Phone Number</label>
-        <input type="tel" class="form-control" id="customerPhone" name="phone" placeholder="Enter your phone number" required>
-        <div class="invalid-feedback">Please enter your phone number.</div>
-      </div>
-      <div class="form-group">
-        <label for="customerAddress1">Address Line 1</label>
-        <input type="text" class="form-control" id="customerAddress1" name="address1" placeholder="Street address, P.O. box" required>
+        <label for="customerAddress">Address</label>
+        <input type="text" class="form-control" id="customerAddress" name="customer_address" value="<?= htmlspecialchars($customer['customer_address']) ?>" required>
         <div class="invalid-feedback">Please enter your address.</div>
       </div>
+
       <div class="form-group">
-        <label for="customerAddress2">Address Line 2</label>
-        <input type="text" class="form-control" id="customerAddress2" name="address2" placeholder="Apartment, suite, unit, building, floor">
+        <label for="customerState">State</label>
+        <input type="text" class="form-control" id="customerState" name="customer_state" value="<?= htmlspecialchars($customer['customer_state']) ?>" required>
+        <div class="invalid-feedback">Please enter your state.</div>
       </div>
-      <div class="form-row">
-        <div class="form-group col-md-4">
-          <label for="customerCity">City</label>
-          <input type="text" class="form-control" id="customerCity" name="city" placeholder="City" required>
-          <div class="invalid-feedback">Please enter your city.</div>
-        </div>
-        <div class="form-group col-md-4">
-          <label for="customerState">State/Province</label>
-          <input type="text" class="form-control" id="customerState" name="state" placeholder="State/Province" required>
-          <div class="invalid-feedback">Please enter your state or province.</div>
-        </div>
-        <div class="form-group col-md-4">
-          <label for="customerZip">ZIP/Postal Code</label>
-          <input type="text" class="form-control" id="customerZip" name="zip" placeholder="ZIP/Postal Code" required>
-          <div class="invalid-feedback">Please enter your ZIP or postal code.</div>
-        </div>
-      </div>
+
       <div class="form-group">
-        <label for="customerCountry">Country</label>
-        <input type="text" class="form-control" id="customerCountry" name="country" placeholder="Country" required>
-        <div class="invalid-feedback">Please enter your country.</div>
+        <label for="customerCity">City</label>
+        <input type="text" class="form-control" id="customerCity" name="customer_city" value="<?= htmlspecialchars($customer['customer_city']) ?>" required>
+        <div class="invalid-feedback">Please enter your city.</div>
       </div>
+
       <div class="form-group">
-        <label for="customerProfilePic">Profile Picture</label>
-        <input type="file" class="form-control-file" id="customerProfilePic" name="profile_pic">
+        <label for="customerProfile">Profile Picture</label><br>
+        <img id="profilePreview"
+             src="<?= !empty($customer['customer_profile']) ? 'data:image/jpeg;base64,' . base64_encode($customer['customer_profile']) : '#' ?>"
+             style="<?= !empty($customer['customer_profile']) ? '' : 'display:none;' ?>"
+             width="120" height="120" class="mb-3 rounded-circle" alt="Profile Picture">
+        <input type="file" class="form-control-file" id="customerProfile" name="customer_profile" accept="image/*">
       </div>
+
+      <div class="form-group">
+        <label for="customerEmail">Email Address</label>
+        <input type="email" class="form-control" id="customerEmail" name="email" value="<?= htmlspecialchars($customer['customer_email']) ?>" required>
+        <div class="invalid-feedback">Please enter a valid email address.</div>
+      </div>
+
+      <div class="form-group">
+        <label for="customerPassword">Password</label>
+        <input type="password" class="form-control" id="customerPassword" name="password" placeholder="Leave blank to keep current password">
+        <div class="invalid-feedback">Please enter a password.</div>
+      </div>
+
+      <div class="form-group">
+        <label for="customerConfirmPassword">Confirm Password</label>
+        <input type="password" class="form-control" id="customerConfirmPassword" name="confirm_password" placeholder="Confirm password">
+        <div class="invalid-feedback">Passwords must match and cannot be empty.</div>
+      </div>
+
       <button type="submit" class="btn btn-primary">Update Account</button>
     </form>
   </div>
+
   <script>
     (function() {
       'use strict';
-      var customerForm = document.getElementById('customerForm');
+      var form = document.getElementById('customerForm');
       var password = document.getElementById('customerPassword');
       var confirmPassword = document.getElementById('customerConfirmPassword');
 
       confirmPassword.addEventListener('input', function() {
-        if(confirmPassword.value !== password.value){
-          confirmPassword.setCustomValidity("Passwords do not match");
-        } else {
-          confirmPassword.setCustomValidity("");
-        }
+        confirmPassword.setCustomValidity(confirmPassword.value !== password.value ? "Passwords do not match" : "");
       });
-      
+
       window.addEventListener('load', function() {
         var forms = document.getElementsByClassName('needs-validation');
         Array.prototype.filter.call(forms, function(form) {
           form.addEventListener('submit', function(event) {
-            // Re-check password validity on form submit
-            if(confirmPassword.value !== password.value){
+            if (password.value && confirmPassword.value !== password.value) {
               confirmPassword.setCustomValidity("Passwords do not match");
-            } else {
-              confirmPassword.setCustomValidity("");
             }
             if (form.checkValidity() === false) {
               event.preventDefault();
@@ -112,6 +107,19 @@
         });
       }, false);
     })();
+
+    document.getElementById('customerProfile').addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = document.getElementById('profilePreview');
+          img.src = e.target.result;
+          img.style.display = 'inline-block';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
   </script>
 </body>
 </html>
