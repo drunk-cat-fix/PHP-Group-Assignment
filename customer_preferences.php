@@ -54,16 +54,24 @@ $products = getAllPreferencesByCusId($_SESSION['customer_id']);
             <th>Product ID</th>
             <th>Product Name</th>
             <th>Product Description</th>
+            <th>Product Picture</th>
             <th>Product Price</th>
         </tr>
         </thead>
         <tbody>
         <?php while ($product=$products->fetch(PDO::FETCH_ASSOC)): ?>
             <tr>
-                <td><?= htmlspecialchars($product['product_id']) ?></td>
-                <td><?= htmlspecialchars($product['product_name']) ?></td>
-                <td><?= htmlspecialchars($product['product_desc']) ?></td>
-                <td class="price">$<?= number_format($product['product_price'], 2) ?></td>
+              <td><?= htmlspecialchars($product['product_id']) ?></td>
+              <td><?= htmlspecialchars($product['product_name']) ?></td>
+              <td><?= htmlspecialchars($product['product_desc']) ?></td>
+              <td>
+                <?php if (!empty($product['product_profile'])): ?>
+                  <img src="data:image/jpeg;base64,<?= base64_encode($product['product_profile']) ?>" width="150" height="150" class="mb-3 rounded" alt="Product Picture">
+                <?php else: ?>
+                  <span class="text-muted">No image</span>
+                <?php endif; ?>
+              </td>
+              <td class="price">$<?= number_format($product['product_price'], 2) ?></td>
             </tr>
         <?php endwhile; ?>
         </tbody>
