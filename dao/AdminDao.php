@@ -254,7 +254,7 @@ class AdminDao
         $stmt = $conn->prepare($sql);
         $staffID = $admin->getStaffID();
         if ($stmt->execute([$staffID])) {
-            header("Location: ../admin_dashboard.php?msg=Staff removed successfully");
+            header("Location: ../admin_manage_staff.php?msg=Staff removed successfully");
             exit();
         } else {
             echo "<p style='color: red;'>Failed to remove staff.</p>";
