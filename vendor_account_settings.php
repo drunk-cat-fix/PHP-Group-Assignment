@@ -1,5 +1,8 @@
 <?php
+session_start();
+require_once 'service/Vendor_Account_Settings.php';
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,95 +12,87 @@
   <style>
     .was-validated .form-control:invalid, .form-control.is-invalid { border-color: #dc3545; }
     .was-validated .form-control:invalid:focus, .form-control.is-invalid:focus { box-shadow: none; }
+    img.rounded-circle { object-fit: cover; }
   </style>
 </head>
 <body>
   <div class="container mt-5">
     <h2>Vendor Account Settings</h2>
-    <form id="vendorForm" class="needs-validation" novalidate action="#" method="POST" enctype="multipart/form-data">
+
+    <?php if (!empty($error)): ?>
+      <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+    <?php elseif (!empty($success)): ?>
+      <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
+    <?php endif; ?>
+
+    <form id="vendorForm" class="needs-validation" novalidate method="POST" enctype="multipart/form-data">
       <div class="form-group">
         <label for="vendorName">Vendor Name</label>
-        <input type="text" class="form-control" id="vendorName" name="vendor_name" placeholder="Enter vendor name" required>
+        <input type="text" class="form-control" id="vendorName" name="vendor_name" value="<?= htmlspecialchars($vendor['vendor_name']) ?>" required>
         <div class="invalid-feedback">Please enter your vendor name.</div>
       </div>
+
+      <div class="form-group">
+        <label for="vendorDesc">Vendor Description</label>
+        <textarea class="form-control" id="vendorDesc" name="vendor_desc" rows="3" required><?= htmlspecialchars($vendor['vendor_desc']) ?></textarea>
+        <div class="invalid-feedback">Please enter your vendor description.</div>
+      </div>
+
+      <div class="form-group">
+        <label for="shopName">Shop Name</label>
+        <input type="text" class="form-control" id="shopName" name="shop_name" value="<?= htmlspecialchars($vendor['shop_name']) ?>" required>
+        <div class="invalid-feedback">Please enter your shop name.</div>
+      </div>
+
+      <div class="form-group">
+        <label for="shopAddress">Shop Address</label>
+        <input type="text" class="form-control" id="shopAddress" name="shop_address" value="<?= htmlspecialchars($vendor['shop_address']) ?>" required>
+        <div class="invalid-feedback">Please enter your shop address.</div>
+      </div>
+
+      <div class="form-group">
+        <label for="shopState">Shop State</label>
+        <input type="text" class="form-control" id="shopState" name="shop_state" value="<?= htmlspecialchars($vendor['shop_state']) ?>" required>
+        <div class="invalid-feedback">Please enter your shop state.</div>
+      </div>
+
+      <div class="form-group">
+        <label for="shopCity">Shop City</label>
+        <input type="text" class="form-control" id="shopCity" name="shop_city" value="<?= htmlspecialchars($vendor['shop_city']) ?>" required>
+        <div class="invalid-feedback">Please enter your shop city.</div>
+      </div>
+
+      <div class="form-group">
+          <label for="vendorProfile">Profile Picture</label><br>
+              <img id="profilePreview" 
+                   src="<?= !empty($vendor['vendor_profile']) ? 'data:image/jpeg;base64,' . base64_encode($vendor['vendor_profile']) : '#' ?>" 
+                   style="<?= !empty($vendor['vendor_profile']) ? '' : 'display:none;' ?>" 
+                   width="120" height="120" class="mb-3 rounded-circle" alt="Profile Picture">
+              <input type="file" class="form-control-file" id="vendorProfile" name="vendor_profile" accept="image/*">
+      </div>
+
       <div class="form-group">
         <label for="vendorEmail">Email Address</label>
-        <input type="email" class="form-control" id="vendorEmail" name="email" placeholder="Enter your email" required>
+        <input type="email" class="form-control" id="vendorEmail" name="email" value="<?= htmlspecialchars($vendor['vendor_email']) ?>" required>
         <div class="invalid-feedback">Please enter a valid email address.</div>
       </div>
+
       <div class="form-group">
         <label for="vendorPassword">Password</label>
-        <input type="password" class="form-control" id="vendorPassword" name="password" placeholder="Enter password" required>
+        <input type="password" class="form-control" id="vendorPassword" name="password" placeholder="Leave blank to keep current password">
         <div class="invalid-feedback">Please enter a password.</div>
       </div>
+
       <div class="form-group">
         <label for="vendorConfirmPassword">Confirm Password</label>
-        <input type="password" class="form-control" id="vendorConfirmPassword" name="confirm_password" placeholder="Re-enter password" required>
+        <input type="password" class="form-control" id="vendorConfirmPassword" name="confirm_password" placeholder="Confirm password">
         <div class="invalid-feedback">Passwords must match and cannot be empty.</div>
       </div>
-      <div class="form-group">
-        <label for="businessName">Business Name</label>
-        <input type="text" class="form-control" id="businessName" name="business_name" placeholder="Enter your business name" required>
-        <div class="invalid-feedback">Please enter your business name.</div>
-      </div>
-      <div class="form-group">
-        <label for="storeName">Store Name</label>
-        <input type="text" class="form-control" id="storeName" name="store_name" placeholder="Enter your store name" required>
-        <div class="invalid-feedback">Please enter your store name.</div>
-      </div>
-      <div class="form-group">
-        <label for="vendorPhone">Phone Number</label>
-        <input type="tel" class="form-control" id="vendorPhone" name="phone" placeholder="Enter your phone number" required>
-        <div class="invalid-feedback">Please enter your phone number.</div>
-      </div>
-      <div class="form-group">
-        <label for="vendorWebsite">Website URL</label>
-        <input type="url" class="form-control" id="vendorWebsite" name="website" placeholder="Enter your website URL" required>
-        <div class="invalid-feedback">Please enter a valid URL.</div>
-      </div>
-      <div class="form-group">
-        <label for="vendorAddress1">Address Line 1</label>
-        <input type="text" class="form-control" id="vendorAddress1" name="address1" placeholder="Street address" required>
-        <div class="invalid-feedback">Please enter your address.</div>
-      </div>
-      <div class="form-group">
-        <label for="vendorAddress2">Address Line 2</label>
-        <input type="text" class="form-control" id="vendorAddress2" name="address2" placeholder="Apartment, suite, etc.">
-      </div>
-      <div class="form-row">
-        <div class="form-group col-md-4">
-          <label for="vendorCity">City</label>
-          <input type="text" class="form-control" id="vendorCity" name="city" placeholder="City" required>
-          <div class="invalid-feedback">Please enter your city.</div>
-        </div>
-        <div class="form-group col-md-4">
-          <label for="vendorState">State/Province</label>
-          <input type="text" class="form-control" id="vendorState" name="state" placeholder="State/Province" required>
-          <div class="invalid-feedback">Please enter your state or province.</div>
-        </div>
-        <div class="form-group col-md-4">
-          <label for="vendorZip">ZIP/Postal Code</label>
-          <input type="text" class="form-control" id="vendorZip" name="zip" placeholder="ZIP/Postal Code" required>
-          <div class="invalid-feedback">Please enter your ZIP or postal code.</div>
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="vendorCountry">Country</label>
-        <input type="text" class="form-control" id="vendorCountry" name="country" placeholder="Country" required>
-        <div class="invalid-feedback">Please enter your country.</div>
-      </div>
-      <div class="form-group">
-        <label for="businessLicense">Business License Number</label>
-        <input type="text" class="form-control" id="businessLicense" name="business_license" placeholder="Enter your business license number" required>
-        <div class="invalid-feedback">Please enter your business license number.</div>
-      </div>
-      <div class="form-group">
-        <label for="vendorLogo">Store Logo</label>
-        <input type="file" class="form-control-file" id="vendorLogo" name="store_logo">
-      </div>
+
       <button type="submit" class="btn btn-primary">Update Account</button>
     </form>
   </div>
+
   <script>
     (function() {
       'use strict';
@@ -106,21 +101,19 @@
       var confirmPassword = document.getElementById('vendorConfirmPassword');
 
       confirmPassword.addEventListener('input', function() {
-        if(confirmPassword.value !== password.value){
+        if (confirmPassword.value !== password.value) {
           confirmPassword.setCustomValidity("Passwords do not match");
         } else {
           confirmPassword.setCustomValidity("");
         }
       });
-      
+
       window.addEventListener('load', function() {
         var forms = document.getElementsByClassName('needs-validation');
         Array.prototype.filter.call(forms, function(form) {
           form.addEventListener('submit', function(event) {
-            if(confirmPassword.value !== password.value){
+            if (password.value && confirmPassword.value !== password.value) {
               confirmPassword.setCustomValidity("Passwords do not match");
-            } else {
-              confirmPassword.setCustomValidity("");
             }
             if (form.checkValidity() === false) {
               event.preventDefault();
@@ -132,5 +125,20 @@
       }, false);
     })();
   </script>
+
+  <script>
+      document.getElementById('vendorProfile').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const img = document.getElementById('profilePreview');
+            img.src = e.target.result;
+            img.style.display = 'inline-block';
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    </script>
 </body>
 </html>
