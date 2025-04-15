@@ -38,12 +38,20 @@ require_once __DIR__. '\service\Admin_Staff_Details.php';
 
 <div class="container">
     <h2>Staff Details</h2>
-    <form method="POST" action="service/Admin_Staff_details.php">
+    <form method="POST" action="service/Admin_Staff_details.php" onsubmit="return confirm('Are you sure you want to remove this staff member?');">
         <input type="hidden" name="staff_id" value="<?= htmlspecialchars($staff['staff_id']) ?>">
         <p><strong>ID:</strong> <?= htmlspecialchars($staff['staff_id']) ?></p>
         <p><strong>Name:</strong> <?= htmlspecialchars($staff['staff_name']) ?></p>
         <p><strong>Address:</strong> <?= htmlspecialchars($staff['staff_address']) ?></p>
         <p><strong>Email:</strong> <?= htmlspecialchars($staff['staff_email']) ?></p>
+        <p><strong>Profile Picture:</strong>
+        <?php if (!empty($staff['staff_profile'])): ?>
+            <img src="data:image/jpeg;base64,<?= base64_encode($staff['staff_profile']) ?>" 
+                 alt="Staff Profile" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;">
+        <?php else: ?>
+            <span>No image</span>
+        <?php endif; ?>
+        </p>
         <button type="submit" name="remove_staff">Remove Staff</button>
     </form>
 
