@@ -20,6 +20,11 @@ require_once 'service/Vendor_Rating.php';
       color: #ddd;
       cursor: pointer;
     }
+    .star-rating label:hover,
+    .star-rating label:hover ~ label,
+    .star-rating input:checked ~ label {
+      color: gold;
+    }
     .star-rating input:checked ~ label,
     .star-rating label:hover,
     .star-rating label:hover ~ label {
@@ -43,8 +48,8 @@ require_once 'service/Vendor_Rating.php';
         <label>Rating</label>
         <div class="star-rating" id="ratingGroup">
           <?php for ($i = 5; $i >= 1; $i--): ?>
-            <label for="star<?= $i ?>">&#9733;</label>
             <input type="radio" id="star<?= $i ?>" name="rating" value="<?= $i ?>" required>
+            <label for="star<?= $i ?>">&#9733;</label>
           <?php endfor; ?>
           <div class="invalid-feedback">Please select a rating.</div>
         </div>

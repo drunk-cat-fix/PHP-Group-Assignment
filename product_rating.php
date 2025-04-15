@@ -1,16 +1,35 @@
 <?php
+session_start();
+require_once 'service/Product_Rating.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Product Rating</title>
+  <title>Rate Product</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <style>
+    .star-rating {
+      display: flex;
+      flex-direction: row-reverse;
+      justify-content: flex-end;
+    }
     .star-rating input { display: none; }
-    .star-rating label { font-size: 2em; color: #ddd; cursor: pointer; }
-    .star-rating input:checked ~ label { color: gold; }
-    .star-rating label:hover, .star-rating label:hover ~ label { color: gold; }
+    .star-rating label {
+      font-size: 2em;
+      color: #ddd;
+      cursor: pointer;
+    }
+    .star-rating label:hover,
+    .star-rating label:hover ~ label,
+    .star-rating input:checked ~ label {
+      color: gold;
+    }
+    .star-rating input:checked ~ label,
+    .star-rating label:hover,
+    .star-rating label:hover ~ label {
+      color: gold;
+    }
     .was-validated .form-control:invalid, .form-control.is-invalid { border-color: #dc3545; }
     .was-validated .form-control:invalid:focus, .form-control.is-invalid:focus { box-shadow: none; }
     .star-rating.is-invalid .invalid-feedback { display: block; color: #dc3545; }
@@ -18,36 +37,38 @@
 </head>
 <body>
   <div class="container mt-5">
-    <h2>Product Rating</h2>
-    <form class="needs-validation" novalidate action="#" method="POST">
-      <div class="form-group">
-        <label for="productId">Product ID</label>
-        <input type="text" class="form-control" id="productId" name="product_id" placeholder="Enter product ID" required>
-        <div class="invalid-feedback">Please enter the product ID.</div>
-      </div>
-      <div class="form-group">
-        <label for="productName">Product Name</label>
-        <input type="text" class="form-control" id="productName" name="product_name" placeholder="Enter product name" required>
-        <div class="invalid-feedback">Please enter the product name.</div>
-      </div>
+    <h2>Rate Product</h2>
+    <p><strong>Product Name:</strong> <?= htmlspecialchars($product['product_name']) ?></p>
+        <?php if (!empty($product['product_profile'])): ?>
+      <p><strong>Product Picture:</strong></p>
+      <img src="data:image/jpeg;base64,<?= base64_encode($product['product_profile']) ?>" width="150" height="150" class="mb-3 rounded" alt="Product Picture">
+    <?php endif; ?>
+
+    <?php if (!empty($error)): ?>
+      <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+    <?php endif; ?>
+
+    <form class="needs-validation" novalidate method="POST">
       <div class="form-group">
         <label>Rating</label>
         <div class="star-rating" id="ratingGroup">
-          <?php for($i = 5; $i >= 1; $i--): ?>
+          <?php for ($i = 5; $i >= 1; $i--): ?>
             <input type="radio" id="star<?= $i ?>" name="rating" value="<?= $i ?>" required>
             <label for="star<?= $i ?>">&#9733;</label>
           <?php endfor; ?>
           <div class="invalid-feedback">Please select a rating.</div>
         </div>
-      </div>
+
       <div class="form-group">
         <label for="productReview">Review</label>
         <textarea class="form-control" id="productReview" name="review" rows="4" placeholder="Enter your review" required></textarea>
         <div class="invalid-feedback">Please provide your review.</div>
       </div>
+
       <button type="submit" class="btn btn-primary">Submit Rating</button>
     </form>
   </div>
+
   <script>
   (function() {
     'use strict';
