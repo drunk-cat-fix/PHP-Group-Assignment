@@ -1,4 +1,6 @@
 <?php
+session_start();
+require_once 'service/Vendor_Rating.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -7,10 +9,22 @@
   <title>Vendor Rating</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <style>
+    .star-rating {
+      display: flex;
+      flex-direction: row-reverse;
+      justify-content: flex-end;
+    }
     .star-rating input { display: none; }
-    .star-rating label { font-size: 2em; color: #ddd; cursor: pointer; }
-    .star-rating input:checked ~ label { color: gold; }
-    .star-rating label:hover, .star-rating label:hover ~ label { color: gold; }
+    .star-rating label {
+      font-size: 2em;
+      color: #ddd;
+      cursor: pointer;
+    }
+    .star-rating input:checked ~ label,
+    .star-rating label:hover,
+    .star-rating label:hover ~ label {
+      color: gold;
+    }
     .was-validated .form-control:invalid, .form-control.is-invalid { border-color: #dc3545; }
     .was-validated .form-control:invalid:focus, .form-control.is-invalid:focus { box-shadow: none; }
     .star-rating.is-invalid .invalid-feedback { display: block; color: #dc3545; }
@@ -18,24 +32,19 @@
 </head>
 <body>
   <div class="container mt-5">
-    <h2>Vendor Rating</h2>
-    <form class="needs-validation" novalidate action="#" method="POST">
-      <div class="form-group">
-        <label for="vendorId">Vendor ID</label>
-        <input type="text" class="form-control" id="vendorId" name="vendor_id" placeholder="Enter vendor ID" required>
-        <div class="invalid-feedback">Please enter the vendor ID.</div>
-      </div>
-      <div class="form-group">
-        <label for="vendorName">Vendor Name</label>
-        <input type="text" class="form-control" id="vendorName" name="vendor_name" placeholder="Enter vendor name" required>
-        <div class="invalid-feedback">Please enter the vendor name.</div>
-      </div>
+    <h2>Rate Vendor</h2>
+    <p><strong>Vendor:</strong> <?= htmlspecialchars($vendor['vendor_name']) ?></p>
+    <p><strong>Shop:</strong> <?= htmlspecialchars($vendor['shop_name']) ?></p>
+    <?php if (!empty($error)): ?>
+      <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+    <?php endif; ?>
+    <form class="needs-validation" novalidate method="POST">
       <div class="form-group">
         <label>Rating</label>
         <div class="star-rating" id="ratingGroup">
-          <?php for($i = 5; $i >= 1; $i--): ?>
-            <input type="radio" id="star<?= $i ?>" name="rating" value="<?= $i ?>" required>
+          <?php for ($i = 5; $i >= 1; $i--): ?>
             <label for="star<?= $i ?>">&#9733;</label>
+            <input type="radio" id="star<?= $i ?>" name="rating" value="<?= $i ?>" required>
           <?php endfor; ?>
           <div class="invalid-feedback">Please select a rating.</div>
         </div>
@@ -58,7 +67,6 @@
           const ratingInputs = form.querySelectorAll('input[name="rating"]');
           const ratingGroup = document.getElementById('ratingGroup');
           const ratingSelected = Array.from(ratingInputs).some(input => input.checked);
-
           if (form.checkValidity() === false || !ratingSelected) {
             event.preventDefault();
             event.stopPropagation();
@@ -66,11 +74,9 @@
               ratingGroup.classList.add('is-invalid');
             }
           }
-
           form.classList.add('was-validated');
         }, false);
       });
-
       const ratingInputs = document.querySelectorAll('input[name="rating"]');
       ratingInputs.forEach(function(input) {
         input.addEventListener('change', function() {
