@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../Utilities/Connection.php';
-$_SESSION['customer_id'] = 1;
+$_SESSION['customer_id'] = 2;
 $customer_id = $_SESSION['customer_id'] ?? null;
 
 if (!$customer_id) {

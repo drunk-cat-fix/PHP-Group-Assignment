@@ -160,26 +160,28 @@ $mimeType = getImageMimeType($avatarData);
 
 <div class="navbar">
     <div class="dropdown">
-        <a href="#" class="nav-item">Livestock</a>
+        <a href="crops.php" class="nav-item">Crops</a>
     </div>
     <div class="dropdown">
-        <a href="#" class="nav-item">Crops</a>
+        <a href="dairy.php" class="nav-item">Dairy</a>
     </div>
-
     <div class="dropdown">
-        <a href="#" class="nav-item">Forestry Products</a>
+        <a href="fish.php" class="nav-item">Fish</a>
     </div>
-
     <div class="dropdown">
-        <a href="#" class="nav-item">Dairy</a>
+        <a href="forestry.php" class="nav-item">Forestry</a>
     </div>
-
     <div class="dropdown">
-        <a href="#" class="nav-item">Miscellaneous products</a>
+        <a href="fruit.php" class="nav-item">Fruit</a>
     </div>
-
     <div class="dropdown">
-        <a href="#" class="nav-item">Others</a>
+        <a href="livestock.php" class="nav-item">Livestock</a>
+    </div>
+    <div class="dropdown">
+        <a href="miscellaneous.php" class="nav-item">Miscellaneous</a>
+    </div>
+    <div class="dropdown">
+        <a href="vegetable.php" class="nav-item">Vegetable</a>
     </div>
 
     <div class="dropdown">
