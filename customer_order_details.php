@@ -91,6 +91,7 @@ $total_amount = 0;
         <thead>
         <tr>
             <th>Product</th>
+            <th>Vendor</th>
             <th>Unit Price</th>
             <th>Quantity</th>
             <th>Total</th>
@@ -104,6 +105,7 @@ $total_amount = 0;
             ?>
             <tr>
                 <td><?= htmlspecialchars($row['product_name']) ?></td>
+                <td><?= htmlspecialchars($row['vendor_name']) ?></td>
                 <td>$<?= number_format($row['product_price'], 2) ?></td>
                 <td><?= htmlspecialchars($row['ordered_quantity']) ?></td>
                 <td>$<?= number_format($row['item_total_price'], 2) ?></td>
@@ -113,7 +115,7 @@ $total_amount = 0;
         </tbody>
         <tfoot>
         <tr class="total-row">
-            <td colspan="3" style="text-align: right;">Subtotal:</td>
+            <td colspan="4" style="text-align: right;">Subtotal:</td>
             <td>$<?= number_format($subtotal, 2) ?></td>
         </tr>
 <!--        <tr class="total-row">-->
@@ -121,11 +123,23 @@ $total_amount = 0;
 <!--            <td>$--><?php //= number_format($order['order_total'] - $subtotal, 2) ?><!--</td>-->
 <!--        </tr>-->
         <tr class="total-row">
-            <td colspan="3" style="text-align: right;">Order Total:</td>
+            <td colspan="4" style="text-align: right;">Order Total:</td>
             <td>$<?= number_format($total_amount, 2) ?></td>
         </tr>
         </tfoot>
     </table>
+    <form action="checkout.php" method="post">
+        <input type="hidden" name="reorder_order_id" value="<?= htmlspecialchars($_GET['order_id']) ?>">
+        <button type="submit" style="
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        ">Reorder This</button>
+    </form>
 </div>
 </body>
 </html>

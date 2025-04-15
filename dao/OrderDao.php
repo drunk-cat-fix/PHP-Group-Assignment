@@ -52,6 +52,7 @@ class OrderDao
     co.deliver_date,
     co.deliver_percent,
     co.deliver_status,
+    v.vendor_name,
     p.product_id,
     p.product_name,
     p.product_desc,
@@ -72,6 +73,8 @@ JOIN
     order_product op ON co.order_id = op.order_id
 JOIN 
     product p ON op.product_id = p.product_id
+JOIN
+    vendor v ON p.product_vendor = v.vendor_id
 WHERE 
     co.customer_id = ?
     AND co.order_id = ?

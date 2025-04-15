@@ -3,7 +3,6 @@
  * This is a modular for the navigation for each page
  *  just require_once this file.
  */
-session_start();
 require_once "Utilities/Connection.php";
 
 $sql = "SELECT customer_name, customer_profile FROM customer WHERE customer_id = ?";
@@ -183,6 +182,13 @@ $mimeType = getImageMimeType($avatarData);
         <a href="#" class="nav-item">Others</a>
     </div>
 
+    <div class="dropdown">
+        <a href="customer_order_history.php" class="nav-item">Order History</a>
+    </div>
+
+    <div class="dropdown">
+        <a href="customer_preferences.php" class="nav-item">Preferences</a>
+    </div>
 
 
 
