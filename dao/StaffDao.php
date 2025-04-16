@@ -2,7 +2,7 @@
 
 use entities\Staff;
 
-require_once __DIR__ . "\..\Utilities\Connection.php";
+require_once __DIR__ . "/../Utilities/Connection.php";
 
 class StaffDao {
     /**

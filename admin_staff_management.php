@@ -1,4 +1,22 @@
 <?php
+//    use \entities\Staff;
+use entities\Staff;
+//require_once 'Utilities/Connection.php';
+require_once 'entities/Staff.php';
+//print_r(getConnection());
+if($_POST){
+    require_once __DIR__ . '/service/Admin_Staff_Management.php';
+    $staff = new Staff();
+    $staff->setStaffPw($_POST['password']);
+    $staff->setStaffName($_POST['name']);
+    $staff->setStaffEmail($_POST['email']);
+
+    if (addStaff($staff)) {
+        echo "<script>alert('Staff added successfully!');</script>";
+    }else{
+        echo "<script>alert('Staff not added!');</script>";
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -63,7 +81,7 @@
   <!-- Add Staff Modal -->
   <div class="modal fade" id="addStaffModal" tabindex="-1" role="dialog" aria-labelledby="addStaffModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
-      <form id="addStaffForm" class="needs-validation" novalidate action="#" method="POST">
+      <form id="addStaffForm" class="needs-validation" novalidate action="admin_staff_management.php" method="POST">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="addStaffModalLabel">Add New Staff</h5>
