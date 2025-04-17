@@ -15,7 +15,6 @@ class PreferenceDao
     p.product_desc,
     p.product_category,
     p.product_price,
-    p.product_rating,
     p.product_profile,
     cp.preference_id
 FROM

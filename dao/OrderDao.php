@@ -61,30 +61,27 @@ class OrderDao
     p.product_packaging,
     p.product_price,
     p.product_vendor,
-    p.product_rating,
     p.product_profile,
     p.product_visit_count,
     op.order_product_id,
     op.qty AS ordered_quantity,
     (op.qty * p.product_price) AS item_total_price
-FROM 
+    FROM 
     customer_order co
-JOIN 
+    JOIN 
     order_product op ON co.order_id = op.order_id
-JOIN 
+    JOIN 
     product p ON op.product_id = p.product_id
-JOIN
+    JOIN
     vendor v ON p.product_vendor = v.vendor_id
-WHERE 
+    WHERE 
     co.customer_id = ?
     AND co.order_id = ?
-ORDER BY 
+    ORDER BY 
     p.product_name";
-
         $stmt = getConnection()->prepare($sql);
         $stmt->bindParam(1, $customer_id, PDO::PARAM_INT);
         $stmt->bindParam(2, $order_id, PDO::PARAM_INT);
-
         $stmt->execute();
         return $stmt;
     }

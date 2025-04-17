@@ -90,11 +90,23 @@ if (!isset($_SESSION['vendor_id'])) {
         function cancelChanges() {
             location.reload();
         }
+        function filterTable() {
+            let input = document.getElementById('searchInput');
+            let filter = input.value.toLowerCase();
+            let rows = document.querySelectorAll('tbody tr');
+
+            rows.forEach(row => {
+                let productName = row.cells[1].textContent.toLowerCase();
+                row.style.display = productName.includes(filter) ? '' : 'none';
+            });
+        }
+
     </script>
 </head>
 <body>
     <h2>Vendor - Manage Products</h2>
     <button onclick="location.href='vendor_add_product.php'">Add Product</button>
+    <input type="text" id="searchInput" placeholder="Search product name..." onkeyup="filterTable()" style="margin-bottom: 10px; padding: 5px; width: 250px;">
     <table>
         <thead>
             <tr>
@@ -108,15 +120,18 @@ if (!isset($_SESSION['vendor_id'])) {
                 <th>Rating</th>
                 <th>Profile</th>
                 <th>Visit Count</th>
-                <th>Actions</th>
+                <!-- Removed Actions column -->
             </tr>
         </thead>
         <tbody>
-            <?php
-            foreach ($products as $product): ?>
+            <?php foreach ($products as $product): ?>
                 <tr>
                     <td><?php echo $product['product_id']; ?></td>
-                    <td><?php echo htmlspecialchars($product['product_name']); ?></td>
+                    <td>
+                        <a href="vendor_edit_product.php?id=<?php echo $product['product_id']; ?>" style="text-decoration:none; color:blue;">
+                            <?php echo htmlspecialchars($product['product_name']); ?>
+                        </a>
+                    </td>
                     <td><?php echo htmlspecialchars($product['product_desc']); ?></td>
                     <td><?php echo htmlspecialchars($product['product_category']); ?></td>
                     <td>
@@ -126,7 +141,7 @@ if (!isset($_SESSION['vendor_id'])) {
                     </td>
                     <td><?php echo htmlspecialchars($product['product_packaging']); ?></td>
                     <td>$<?php echo number_format($product['product_price'], 2); ?></td>
-                    <td><?php echo $product['product_rating']; ?></td>
+                    <td><?php echo $product['avg_rating']; ?></td>
                     <td>
                         <?php
                         if (!empty($product['product_profile'])) {
@@ -138,9 +153,7 @@ if (!isset($_SESSION['vendor_id'])) {
                         ?>
                     </td>
                     <td><?php echo $product['product_visit_count']; ?></td>
-                    <td>
-                        <button onclick="location.href='vendor_edit_product.php?id=<?php echo $product['product_id']; ?>'">Edit</button>
-                    </td>
+                    <!-- Removed Edit button -->
                 </tr>
             <?php endforeach; ?>
         </tbody>

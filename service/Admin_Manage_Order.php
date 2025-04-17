@@ -9,7 +9,8 @@ $conn = getConnection();
 $pendingOrdersQuery = "
     SELECT co.order_id, co.customer_id, co.order_date, co.order_time, co.amount
     FROM customer_order co
-    WHERE NOT EXISTS (
+    WHERE co.deliver_status = 'Pending'
+      AND NOT EXISTS (
         SELECT 1 FROM order_product op
         WHERE op.order_id = co.order_id
         AND op.status <> 'Complete'

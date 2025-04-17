@@ -1,3 +1,7 @@
+<?php
+session_start();
+require_once 'service/Cart.php';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -44,12 +48,12 @@
                     <td><?= number_format($item['total'], 2) ?></td>
                     <td>
                         <form method="POST" style="display:inline;">
-                            <input type="hidden" name="product" value="<?= htmlspecialchars($item['product_name']) ?>">
+                            <input type="hidden" name="product" value="<?= $item['product_id'] ?>">
                             <input type="number" name="quantity" value="<?= $item['quantity'] ?>" step="1" min="1">
                             <button type="submit" name="update" class="btn update-btn">Update</button>
                         </form>
                         <form method="POST" style="display:inline;">
-                            <input type="hidden" name="product" value="<?= htmlspecialchars($item['product_name']) ?>">
+                            <input type="hidden" name="product" value="<?= $item['product_id'] ?>">
                             <button type="submit" name="remove" class="btn remove-btn">Remove</button>
                         </form>
                     </td>

@@ -234,21 +234,12 @@ class VendorDao {
     public function denyOrder(Vendor $vendor, $reason) {
         $conn = getConnection();
 
-        // Update status to 'Denied'
-        $sql = "UPDATE order_product SET status = 'Denied' WHERE order_id = :order_id";
+        // Update status to 'Denied' and store the reason
+        $sql = "UPDATE order_product SET status = 'Denied', reason = :reason WHERE order_id = :order_id";
         $stmt = $conn->prepare($sql);
         $stmt->bindValue(':order_id', $vendor->getOrderID(), PDO::PARAM_INT);
-        $stmt->execute();
-
-        // Optionally log the reason in another table or in the same table (if you have a column for it)
-        // Example if order_product has 'denial_reason' column:
-        /*
-        $sqlReason = "UPDATE order_product SET denial_reason = :reason WHERE order_id = :order_id";
-        $stmtReason = $conn->prepare($sqlReason);
-        $stmtReason->bindValue(':order_id', $vendor->getOrderID(), PDO::PARAM_INT);
-        $stmtReason->bindValue(':reason', $reason, PDO::PARAM_STR);
-        $stmtReason->execute();
-        */
+        $stmt->bindValue(':reason', $reason, PDO::PARAM_STR);
+        return $stmt->execute();
     }
 
     public function addService($vendor)

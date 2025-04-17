@@ -1,6 +1,8 @@
-<?php
+﻿<?php
 session_start();
 require_once 'service/Admin_Manage_Order.php';
+require_once 'service/Admin_Notification.php';
+$notificationCount = count($notifications);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -32,11 +34,30 @@ require_once 'service/Admin_Manage_Order.php';
         button:hover {
             background-color: #0056b3;
         }
+        .notification {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .notification .badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            padding: 5px 8px;
+            border-radius: 50%;
+            background: red;
+            color: white;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
+    <a href="admin_notifications_page.php" class="notification">
+        🔔<span class="badge"><?= $notificationCount ?></span>
+    </a>
     <h2>Admin - Manage Orders</h2>
-    
     <h3>Pending Orders</h3>
     <table>
         <thead>

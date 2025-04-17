@@ -1,6 +1,6 @@
 ﻿<?php
 session_start();
-$_SESSION['vendor_id'] = 1;
+$_SESSION['vendor_id'] = 3;
 require_once 'service/Vendor_Edit_Product.php';
 ?>
 

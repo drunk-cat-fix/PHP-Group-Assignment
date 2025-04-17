@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../Utilities/Connection.php';
-$_SESSION['vendor_id'] = 4;
+$_SESSION['vendor_id'] = 3;
 $vendor_id = $_SESSION['vendor_id'] ?? null;
 
 if (!$vendor_id) {
@@ -11,6 +11,18 @@ $error = '';
 $success = '';
 
 $conn = getConnection();
+
+if (isset($_GET['delete']) && $_GET['delete'] == 1) {
+  $deleteStmt = $conn->prepare("DELETE FROM vendor WHERE vendor_id = :vendor_id");
+  if ($deleteStmt->execute([':vendor_id' => $vendor_id])) {
+    session_destroy();
+    echo "<script>alert('Your account has been deleted.'); window.location.href='login.php';</script>";
+    exit;
+  } else {
+    $error = "Failed to delete account: " . $deleteStmt->errorInfo()[2];
+  }
+}
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $vendor_name = $_POST['vendor_name'];

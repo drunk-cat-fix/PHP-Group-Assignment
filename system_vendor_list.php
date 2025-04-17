@@ -62,10 +62,42 @@ require_once 'service/System_Vendor_List.php';
             // Reload the page to reset any changes
             location.reload();
         }
+        function deleteVendor(vendorId) {
+            if (confirm("Are you sure you want to delete this vendor?")) {
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "service/System_Vendor_List.php", true);
+                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                xhr.onload = function () {
+                    if (xhr.status === 200) {
+                        alert("✅ " + xhr.responseText);
+                        location.reload(); // Reload page to reflect deletion
+                    } else {
+                        alert("❌ Failed to delete vendor.");
+                    }
+                };
+                xhr.send("deleteVendorId=" + vendorId);
+            }
+        }
+        function filterTable() {
+            var input = document.getElementById("searchInput");
+            var filter = input.value.toLowerCase();
+            var table = document.querySelector("table");
+            var tr = table.getElementsByTagName("tr");
+
+            // Loop through table rows (start from 1 to skip the header)
+            for (var i = 1; i < tr.length; i++) {
+                var td = tr[i].getElementsByTagName("td")[1]; // Vendor Name is column index 1
+                if (td) {
+                    var txtValue = td.textContent || td.innerText;
+                    tr[i].style.display = txtValue.toLowerCase().includes(filter) ? "" : "none";
+                }
+            }
+        }
     </script>
 </head>
 <body>
     <h2>Admin - Manage Vendors</h2>
+    <input type="text" id="searchInput" placeholder="Search by vendor name..." onkeyup="filterTable()" style="margin-bottom: 15px; padding: 8px; width: 300px;">
     <table>
         <thead>
             <tr>
@@ -80,6 +112,7 @@ require_once 'service/System_Vendor_List.php';
                 <th>Visit Count</th>
                 <th>Profile</th>
                 <th>Email</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
@@ -119,6 +152,9 @@ require_once 'service/System_Vendor_List.php';
                         ?>
                     </td>
                     <td><?php echo $vendor['vendor_email']; ?></td>
+                    <td>
+                        <button onclick="deleteVendor(<?php echo $vendor['vendor_id']; ?>)">Delete</button>
+                    </td>
                 </tr>
             <?php endforeach; ?>
         </tbody>

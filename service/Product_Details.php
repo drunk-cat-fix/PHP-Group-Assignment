@@ -30,6 +30,20 @@ if (isset($_POST['add_to_cart'])) {
 // Get the product ID from the URL
 $product_id = isset($_GET['product_id']) ? $_GET['product_id'] : 0;
 
+$visit_sql = "UPDATE product SET product_visit_count = product_visit_count + 1 WHERE product_id = :product_id";
+$visit_stmt = $conn->prepare($visit_sql);
+$visit_stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
+$visit_stmt->execute();
+
+if (isset($_GET['from_search']) && $_GET['from_search'] == 1 && isset($_SESSION['searched_ids'])) {
+    if (in_array($product_id, $_SESSION['searched_ids'])) {
+        $search_sql = "UPDATE product SET product_search_count = product_search_count + 1 WHERE product_id = :product_id";
+        $search_stmt = $conn->prepare($search_sql);
+        $search_stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
+        $search_stmt->execute();
+    }
+}
+
 // Fetch the product details from the database
 $sql = "SELECT 
             p.product_name,
@@ -38,6 +52,7 @@ $sql = "SELECT
             p.product_qty,
             p.product_packaging,
             p.product_price,
+            p.product_promotion,
             v.vendor_name,
             p.product_profile
         FROM product p
@@ -52,6 +67,14 @@ $stmt->execute();
 // Fetch the product details
 $product = $stmt->fetch(PDO::FETCH_ASSOC);
 
+// Calculate promotion price if applicable
+$has_promotion = false;
+$promotion_price = null;
+if (!empty($product['product_promotion']) && $product['product_promotion'] < 1) {
+    $has_promotion = true;
+    $promotion_price = $product['product_price'] * $product['product_promotion'];
+}
+
 // Fetch the rating for the product
 $rating_sql = "SELECT AVG(product_rating) as avg_rating FROM product_review WHERE product_id = :product_id";
 $rating_stmt = $conn->prepare($rating_sql);
@@ -61,4 +84,38 @@ $rating = $rating_stmt->fetch(PDO::FETCH_ASSOC);
 
 // Calculate the average rating (if there are reviews)
 $avg_rating = $rating['avg_rating'] ? number_format($rating['avg_rating'], 2) : 'No ratings yet';
+
+// Handle saving product as preference
+if (isset($_POST['save_preference']) && isset($_SESSION['customer_id'])) {
+    $customer_id = $_SESSION['customer_id'];
+    $product_id = $_POST['product_id'];
+    
+    // Check if preference already exists
+    $check_sql = "SELECT * FROM customer_preference 
+                  WHERE customer_id = :customer_id AND product_id = :product_id";
+    $check_stmt = $conn->prepare($check_sql);
+    $check_stmt->bindParam(':customer_id', $customer_id, PDO::PARAM_INT);
+    $check_stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
+    $check_stmt->execute();
+    
+    if ($check_stmt->rowCount() == 0) {
+        // Insert new preference if it doesn't exist
+        $insert_sql = "INSERT INTO customer_preference (customer_id, product_id) 
+                       VALUES (:customer_id, :product_id)";
+        $insert_stmt = $conn->prepare($insert_sql);
+        $insert_stmt->bindParam(':customer_id', $customer_id, PDO::PARAM_INT);
+        $insert_stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
+        
+        try {
+            $insert_stmt->execute();
+            $_SESSION['message'] = "Product saved to your preferences!";
+        } catch (PDOException $e) {
+            $_SESSION['message'] = "Error saving preference: " . $e->getMessage();
+        }
+    } else {
+        // Preference already exists
+        $_SESSION['message'] = "This product is already in your preferences!";
+    }
+}
+unset($_SESSION['searched_ids']);
 ?>

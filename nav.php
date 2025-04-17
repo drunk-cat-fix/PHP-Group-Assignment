@@ -4,6 +4,8 @@
  *  just require_once this file.
  */
 require_once "Utilities/Connection.php";
+require_once 'service/Customer_Notification.php';
+$notificationCount = count($notifications);
 
 $sql = "SELECT customer_name, customer_profile FROM customer WHERE customer_id = ?";
 $stmt = getConnection()->prepare($sql);
@@ -154,6 +156,43 @@ $mimeType = getImageMimeType($avatarData);
             background-color: #e63946;
             transform: scale(1.05);
         }
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+        }
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 5px 10px;
+        }
+        .nav-links a:hover {
+            background-color: #555;
+            border-radius: 4px;
+        }
+        .notification-icon {
+            position: relative;
+            font-size: 20px;
+            cursor: pointer;
+            margin-left: 15px;
+        }
+        .badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            padding: 3px 6px;
+            border-radius: 50%;
+            background: red;
+            color: white;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
@@ -194,37 +233,15 @@ $mimeType = getImageMimeType($avatarData);
         <a href="customer_preferences.php" class="nav-item">Preferences</a>
     </div>
 
-
-
-
-</div>
-
-<div class="avatar-container">
-    <label for="upload-avatar">
-        <?php if (!empty($avatarData)): ?>
-            <img id="avatar-img" class="avatar"
-                 src="data:<?= $mimeType ?>;base64,<?= base64_encode($avatarData) ?>"
-                 alt="<?= htmlspecialchars($userName) ?> ` profile" >
-        <?php else: ?>
-            <img id="avatar-img" class="avatar" src="image/default.jpg" alt="Default Profile">
+    <a href="customer_notifications_page.php" class="notification-icon">
+        🔔
+        <?php if ($notificationCount > 0): ?>
+            <span class="badge"><?= $notificationCount ?></span>
         <?php endif; ?>
-    </label>
+    </a>
 
-    <input type="file" id="upload-avatar" accept="image/*">
-
-    <div class="welcome">Welcome <?= htmlspecialchars($userName) ?>!</div>
 </div>
 
-<form action="nav.php" method="post" style="text-align: center; margin-top: 20px;">
-    <a href="login.php" type="submit" class="logout-btn">Logout</a>
-</form>
-<div id="previewModal" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <img id="preview-img" src="" alt="Preview Profile">
-        <button id="upload-button">Upload</button>
-    </div>
-</div>
 
 <script>
     document.getElementById("avatar-img").addEventListener("click", function () {

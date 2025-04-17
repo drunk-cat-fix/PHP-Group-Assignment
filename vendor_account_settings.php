@@ -90,10 +90,16 @@ require_once 'service/Vendor_Account_Settings.php';
       </div>
 
       <button type="submit" class="btn btn-primary">Update Account</button>
+      <button type="button" class="btn btn-danger mt-3" onclick="confirmDelete()">Delete Account</button>
     </form>
   </div>
 
   <script>
+      function confirmDelete() {
+        if (confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+          window.location.href = "vendor_account_settings.php?delete=1";
+        }
+      }
     (function() {
       'use strict';
       var vendorForm = document.getElementById('vendorForm');

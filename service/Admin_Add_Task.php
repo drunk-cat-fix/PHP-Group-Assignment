@@ -4,6 +4,11 @@ require_once __DIR__ . '/../entities/Admin.php';
 require_once __DIR__ . '/../dao/AdminDao.php';
 require_once __DIR__ . '/../Utilities/Connection.php';
 
+// Enable error logging
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 $staffList = [];
 $conn = getConnection();
 $staffQuery = "SELECT staff_id, staff_name FROM staff";
@@ -38,22 +43,35 @@ if (isset($_GET['order_id']) && !empty($_GET['order_id'])) {
     
     // Set pre-filled values
     $taskName = "Order Delivery #" . $orderId;
-    $taskDesc = "This is a delivery task. You need to pick up a package from " . $vendorName . " and deliver to address.";
+    $taskDesc = "This is a delivery task. You need to pick up a package from " . $vendorName . " and deliver to address."; //change address to customer address, need to read database.
 }
 
-if ($_POST) {
-    $admin = new Admin();
-    $admin->setTaskName($_POST['task_name']);
-    $admin->setTaskDesc($_POST['task_desc']);
-    $admin->setTaskStartDate($_POST['task_start_date']);
-    $admin->setTaskDueDate($_POST['task_due_date']);
-    $admin->setAssignedStaff($_POST['assigned_staff']);
-    $adminDao = new AdminDao();
-    $action = $adminDao->addTask($admin);
-    if ($action) {
-        header("location: ../admin_task_list.php");
-    } else {
-        header("location: ../admin_add_task.php?errMsg=Failed to add task!");
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    try {        
+        $admin = new Admin();
+        $admin->setTaskName($_POST['task_name']);
+        $admin->setTaskDesc($_POST['task_desc']);
+        $admin->setTaskStartDate($_POST['task_start_date']);
+        $admin->setTaskDueDate($_POST['task_due_date']);
+        
+        // Check if assigned_staff exists in POST data
+        $assignedStaff = isset($_POST['assigned_staff']) ? $_POST['assigned_staff'] : [];
+        $admin->setAssignedStaff($assignedStaff);
+        
+        $adminDao = new AdminDao();
+        $action = $adminDao->addTask($admin);
+        
+        if ($action) {
+            header("Location: ../admin_task_list.php");
+            exit;
+        } else {
+            header("Location: ../admin_add_task.php?errMsg=Failed to add task!");
+            exit;
+        }
+    } catch (Exception $e) {
+        error_log("Exception in Admin_Add_Task.php: " . $e->getMessage());
+        header("Location: ../admin_add_task.php?errMsg=Exception: " . urlencode($e->getMessage()));
+        exit;
     }
 }
 ?>

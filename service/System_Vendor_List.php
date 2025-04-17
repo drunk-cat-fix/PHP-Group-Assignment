@@ -11,6 +11,19 @@ $stmt->execute();
 $stmt->bindColumn('vendor_profile', $vendor['vendor_profile'], PDO::PARAM_LOB);
 $vendors = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Handle vendor deletion
+if (isset($_POST['deleteVendorId'])) {
+    $vendorId = $_POST['deleteVendorId'];
+    
+    $conn = getConnection();
+    $stmt = $conn->prepare("DELETE FROM vendor WHERE vendor_id = ?");
+    $deleted = $stmt->execute([$vendorId]);
+
+    echo $deleted ? "Vendor deleted successfully!" : "Failed to delete vendor.";
+    exit;
+}
+
+
 // Check if this is an AJAX request to update vendor tier
 if (isset($_POST['vendorId']) && isset($_POST['tier'])) {
     $staff = new StaffDao();

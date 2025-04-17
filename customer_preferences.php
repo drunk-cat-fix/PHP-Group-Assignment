@@ -62,7 +62,11 @@ $products = getAllPreferencesByCusId($_SESSION['customer_id']);
         <?php while ($product=$products->fetch(PDO::FETCH_ASSOC)): ?>
             <tr>
               <td><?= htmlspecialchars($product['product_id']) ?></td>
-              <td><?= htmlspecialchars($product['product_name']) ?></td>
+              <td>
+                  <a href="product_details.php?product_id=<?= urlencode($product['product_id']) ?>">
+                    <?= htmlspecialchars($product['product_name']) ?>
+                  </a>
+                </td>
               <td><?= htmlspecialchars($product['product_desc']) ?></td>
               <td>
                 <?php if (!empty($product['product_profile'])): ?>

@@ -42,22 +42,34 @@ require_once 'service/Products.php';
     </style>
 </head>
 <body>
-
 <h1>Product List</h1>
+<form method="get" action="products.php" style="padding: 20px;">
+    <input type="text" name="query" placeholder="Search..." value="<?= htmlspecialchars($_GET['query'] ?? '') ?>">
+    <button type="submit">Go</button>
+</form>
+
 <div class="product-grid">
     <?php foreach ($products as $product): ?>
         <div class="product-card">
             <!-- Clickable image and name that redirects to product_details.php -->
-            <a href="product_details.php?product_id=<?= $product['product_id'] ?>">
+            <a href="product_details.php?product_id=<?= $product['product_id'] ?><?= !empty($query) ? '&from_search=1' : '' ?>">
+
                 <img src="<?= isset($product['product_profile']) ? 'data:image/jpeg;base64,' . base64_encode($product['product_profile']) : 'path_to_placeholder_image.jpg' ?>" alt="<?= htmlspecialchars($product['product_name']) ?>">
             </a>
-            <a href="product_details.php?product_id=<?= $product['product_id'] ?>">
+            <a href="product_details.php?product_id=<?= $product['product_id'] ?><?= !empty($query) ? '&from_search=1' : '' ?>">
                 <h3><?= htmlspecialchars($product['product_name']) ?></h3>
             </a>
-            <p class="price">Price: RM <?= number_format($product['product_price'], 2) ?></p>
+            <?php if ($product['promo_price']): ?>
+                <p class="price">
+                    <del style="color: #999;">RM <?= number_format($product['product_price'], 2) ?></del>
+                    <span style="color: red; font-weight: bold;">RM <?= number_format($product['promo_price'], 2) ?></span>
+                </p>
+            <?php else: ?>
+                <p class="price">Price: RM <?= number_format($product['product_price'], 2) ?></p>
+            <?php endif; ?>
             <p class="category">Category: <?= htmlspecialchars($product['product_category']) ?></p>
             <p><?= htmlspecialchars($product['product_desc']) ?></p>
-            <p>Rating: <?= htmlspecialchars($product['product_rating']) ?></p>
+            <p>Rating: <?= $product['avg_rating'] ?></p>
             <p>Quantity left: <?= htmlspecialchars($product['product_qty']) ?></p>
         </div>
     <?php endforeach; ?>

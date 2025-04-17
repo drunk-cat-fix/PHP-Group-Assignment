@@ -43,6 +43,8 @@ require_once "service/Admin_Task_Details.php";
         <p><strong>Due Date:</strong> <?php echo htmlspecialchars($task['task_due_date']); ?></p>
         <p><strong>Complete Date:</strong> <?php echo htmlspecialchars($task['task_done_date'] ?: 'N/A'); ?></p>
         <p><strong>Order ID:</strong> <?php echo htmlspecialchars($task['order_id']); ?></p>
+        <p><strong>Assigned Staff:</strong> <?php echo $staff_names ?: 'No staff assigned'; ?></p>
+    
         <button class="edit-btn" onclick="editTask()">Edit Task</button>
         <button class="back-btn" onclick="goBack()">Back</button>
     </div>

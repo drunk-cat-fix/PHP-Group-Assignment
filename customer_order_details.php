@@ -3,9 +3,8 @@ session_start();
 require_once __DIR__. '/nav.php';
 require_once __DIR__. '/Utilities/Connection.php';
 require_once __DIR__. '/service/Customer_Order_Operations.php';
-$order= getOrderDetailsByCustomerIdAndOrderId($_SESSION['customer_id'], $_GET['order_id']);
+$order = getOrderDetailsByCustomerIdAndOrderId($_SESSION['customer_id'], $_GET['order_id']);
 $total_amount = 0;
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -80,11 +79,9 @@ $total_amount = 0;
 <div class="container">
     <div class="header">
         <h1>Order Details</h1>
-
     </div>
 
     <div class="order-info">
-
     </div>
 
     <table>
@@ -100,15 +97,15 @@ $total_amount = 0;
         <tbody>
         <?php
         $subtotal = 0;
-        while ($row = $order->FETCH(PDO::FETCH_ASSOC)) :
+        while ($row = $order->fetch(PDO::FETCH_ASSOC)) :
             $subtotal += $row['item_total_price'];
             ?>
             <tr>
                 <td><?= htmlspecialchars($row['product_name']) ?></td>
                 <td><?= htmlspecialchars($row['vendor_name']) ?></td>
-                <td>$<?= number_format($row['product_price'], 2) ?></td>
+                <td>RM <?= number_format($row['product_price'], 2) ?></td>
                 <td><?= htmlspecialchars($row['ordered_quantity']) ?></td>
-                <td>$<?= number_format($row['item_total_price'], 2) ?></td>
+                <td>RM <?= number_format($row['item_total_price'], 2) ?></td>
                 <div hidden="hidden"><?= $total_amount+=$row['item_total_price'] ?> </div>
             </tr>
         <?php endwhile; ?>
@@ -116,15 +113,11 @@ $total_amount = 0;
         <tfoot>
         <tr class="total-row">
             <td colspan="4" style="text-align: right;">Subtotal:</td>
-            <td>$<?= number_format($subtotal, 2) ?></td>
+            <td>RM <?= number_format($subtotal, 2) ?></td>
         </tr>
-<!--        <tr class="total-row">-->
-<!--            <td colspan="3" style="text-align: right;">Tax:</td>-->
-<!--            <td>$--><?php //= number_format($order['order_total'] - $subtotal, 2) ?><!--</td>-->
-<!--        </tr>-->
         <tr class="total-row">
             <td colspan="4" style="text-align: right;">Order Total:</td>
-            <td>$<?= number_format($total_amount, 2) ?></td>
+            <td>RM <?= number_format($total_amount, 2) ?></td>
         </tr>
         </tfoot>
     </table>

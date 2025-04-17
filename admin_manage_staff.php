@@ -109,6 +109,13 @@ if ($_POST) {
         button:hover {
             background-color: #45a049;
         }
+        .task-section h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .task-section table {
+            background-color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -151,7 +158,10 @@ if ($_POST) {
         <th>Staff Name</th>
         <th>Address</th>
         <th>Email</th>
-        <th>Profile Picture</th>
+        <th>Tasks Assigned</th>
+        <th>Tasks Completed</th>
+        <th>Overdue Tasks</th>
+        <th>Completion Rate</th>
     </tr>
     </thead>
     <tbody>
@@ -166,23 +176,19 @@ if ($_POST) {
                 </td>
                 <td><?= htmlspecialchars($staff['staff_address']) ?></td>
                 <td><?= htmlspecialchars($staff['staff_email']) ?></td>
-                <td>
-                    <?php if (!empty($staff['staff_profile'])): ?>
-                        <img src="data:image/jpeg;base64,<?= base64_encode(stripslashes($staff['staff_profile'])) ?>"
-                             alt="Staff Profile"
-                             style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;">
-                    <?php else: ?>
-                        <span>No image</span>
-                    <?php endif; ?>
-                </td>
+                <td><?= $staff['tasks_assigned'] ?></td>
+                <td><?= $staff['tasks_completed'] ?></td>
+                <td><?= $staff['overdue_tasks'] ?></td>
+                <td><?= $staff['completion_rate'] ?>%</td>
             </tr>
         <?php endforeach; ?>
     <?php else: ?>
         <tr>
-            <td colspan="5">No staff found.</td>
+            <td colspan="8">No staff found.</td>
         </tr>
     <?php endif; ?>
     </tbody>
+
 </table>
 
 <script>

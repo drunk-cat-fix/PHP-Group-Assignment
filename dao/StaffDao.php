@@ -183,7 +183,7 @@ class StaffDao {
 
         try {
             foreach ($progressUpdates as $update) {
-                $sql = "UPDATE customer_order SET deliver_percent = ? WHERE order_id = ?";
+                $sql = "UPDATE customer_order SET deliver_percent = ?, isInProgress = FALSE, isDelivered = TRUE WHERE order_id = ?";
                 $stmt = $conn->prepare($sql);
                 $stmt->execute([$update['progress'], $update['order_id']]);
             }

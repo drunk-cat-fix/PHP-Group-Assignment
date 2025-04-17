@@ -135,15 +135,14 @@ class AdminDao
         $taskStartDate = $admin->getTaskStartDate();
         $taskDueDate = $admin->getTaskDueDate();
 
-        // Extract Order ID if task name contains "#1234"
         $orderID = null;
         if (preg_match('/#(\d+)/', $taskName, $matches)) {
-            $orderID = $matches[1]; // Extracts the number after #
+            $orderID = $matches[1];
         }
 
         try {
             $conn->beginTransaction();
-        
+
             if ($orderID) {
                 $sql = "INSERT INTO task (task_name, task_desc, task_start_date, task_due_date, order_id) 
                         VALUES (?, ?, ?, ?, ?)";
@@ -157,18 +156,23 @@ class AdminDao
                 $stmt->execute([$taskName, $taskDesc, $taskStartDate, $taskDueDate]);
             }
 
-            $taskID = $this->getLatestTaskId();
+            $taskID = $conn->lastInsertId();
             $assignedStaffs = $admin->getAssignedStaff();
-        
-            $result = $this->assignTask($taskID, $assignedStaffs);
-        
+
+            // Always commit if the task creation was successful
             $conn->commit();
-            return $result;
+
+            // Directly return the result of assignTask using $this
+            return $this->assignTask($taskID, $assignedStaffs); // Use $this instead of calling assignTask() globally
+
         } catch (Exception $e) {
+            // Log the error for debugging
+            error_log("Error adding task: " . $e->getMessage());
             $conn->rollBack();
             return false;
         }
     }
+
 
     public function editTask(Admin $admin)
     {
@@ -215,16 +219,26 @@ class AdminDao
         if (!$taskID || empty($assignedStaffs)) {
             return false;
         }
-    
-        $conn = getConnection();  
-        $sql = "INSERT INTO staff_task (staff_id, task_id) VALUES (?, ?)";
-        $stmt = $conn->prepare($sql);
 
-        foreach ($assignedStaffs as $staffId) {
-            $stmt->execute([$staffId, $taskID]);
+        try {
+            $conn = getConnection();
+            $conn->beginTransaction();
+            $sql = "INSERT INTO staff_task (staff_id, task_id) VALUES (?, ?)";
+            $stmt = $conn->prepare($sql);
+
+            foreach ($assignedStaffs as $staffId) {
+                $stmt->execute([$staffId, $taskID]);
+            }
+
+            $conn->commit();
+            return true;
+        } catch (Exception $e) {
+            error_log("Error assigning task: " . $e->getMessage());
+            if (isset($conn)) {
+                $conn->rollBack();
+            }
+            return false;
         }
-        
-        return true;
     }
 
     public function changeDeliverStatus($orderID, $conn = null)
@@ -233,7 +247,7 @@ class AdminDao
             $conn = getConnection();
         }
     
-        $sql = "UPDATE customer_order SET deliver_status = 'In Progress' WHERE order_id = ?";
+        $sql = "UPDATE customer_order SET deliver_status = 'In Progress', isPending = FALSE, isInProgress = TRUE WHERE order_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->execute([$orderID]);
     }

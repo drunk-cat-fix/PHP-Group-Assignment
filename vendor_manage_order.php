@@ -2,6 +2,8 @@
 session_start();
 $_SESSION['vendor_id'] = 3;
 require_once 'service/Vendor_Manage_Order.php';
+require_once 'service/Vendor_Notification.php';
+$notificationCount = count($notifications);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -44,6 +46,23 @@ require_once 'service/Vendor_Manage_Order.php';
         .debug-message {
             margin: 5px 0;
             font-family: monospace;
+        }
+        .notification {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .notification .badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            padding: 5px 8px;
+            border-radius: 50%;
+            background: red;
+            color: white;
+            font-size: 12px;
         }
     </style>
     <script>
@@ -91,6 +110,9 @@ require_once 'service/Vendor_Manage_Order.php';
     </script>
 </head>
 <body>
+    <a href="vendor_notifications_page.php" class="notification">
+        🔔<span class="badge"><?= $notificationCount ?></span>
+    </a>
     <h2>Vendor - View Orders</h2>
     <table>
         <thead>

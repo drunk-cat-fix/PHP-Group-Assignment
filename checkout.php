@@ -2,8 +2,8 @@
 session_start();
 require_once 'service/Checkout.php';
 $_SESSION['reorder_items'] = $reorderItems;
+$_SESSION['grand_total'] = $grand_total;
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,14 +30,51 @@ $_SESSION['reorder_items'] = $reorderItems;
             cursor: pointer;
             margin-top: 10px;
         }
+        .back-to-cart {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #f0f0f0;
+            color: #333;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .payment-methods {
+            margin: 20px 0;
+        }
+        .payment-methods label {
+            display: block;
+            margin-bottom: 8px;
+        }
     </style>
     <script>
         function validateCheckout() {
             const checkbox = document.getElementById('confirm_order');
+            const paymentMethods = document.getElementsByName('payment_method');
+            let methodSelected = false;
+            let selectedValue = "";
+
+            for (let i = 0; i < paymentMethods.length; i++) {
+                if (paymentMethods[i].checked) {
+                    methodSelected = true;
+                    selectedValue = paymentMethods[i].value;
+                    break;
+                }
+            }
+
+            if (!methodSelected) {
+                alert('Please select a payment method.');
+                return false;
+            }
+
             if (!checkbox.checked) {
                 alert('Please confirm your order before proceeding.');
                 return false;
             }
+
+            // Redirect to selected payment page
+            const form = document.getElementById('checkoutForm');
+            form.action = selectedValue + '?order_id=<?= urlencode($order_id ?? uniqid("ORD")) ?>';
             return true;
         }
     </script>
@@ -45,9 +82,8 @@ $_SESSION['reorder_items'] = $reorderItems;
 <body>
 <div class="container">
     <h2>Checkout</h2>
-
     <?php if (count($reorderItems) > 0): ?>
-        <form action="payment.php" method="post" onsubmit="return validateCheckout();">
+        <form id="checkoutForm" method="post" onsubmit="return validateCheckout();">
             <table>
                 <thead>
                 <tr>
@@ -63,25 +99,33 @@ $_SESSION['reorder_items'] = $reorderItems;
                     <tr>
                         <td><?= htmlspecialchars($item['product_name']) ?></td>
                         <td><?= htmlspecialchars($item['vendor_name']) ?></td>
-                        <td>$<?= number_format($item['product_price'], 2) ?></td>
+                        <td>RM <?= number_format($item['product_price'], 2) ?></td>
                         <td><?= $item['ordered_quantity'] ?></td>
-                        <td>$<?= number_format($item['item_total_price'], 2) ?></td>
+                        <td>RM <?= number_format($item['item_total_price'], 2) ?></td>
                     </tr>
                 <?php endforeach; ?>
                 </tbody>
                 <tfoot>
                 <tr class="total-row">
                     <td colspan="4" style="text-align: right;">Subtotal:</td>
-                    <td>$<?= number_format($subtotal, 2) ?></td>
+                    <td>RM <?= number_format($subtotal, 2) ?></td>
                 </tr>
                 <tr class="total-row">
                     <td colspan="4" style="text-align: right;">Grand Total:</td>
-                    <td>$<?= number_format($grand_total, 2) ?></td>
+                    <td>RM <?= number_format($grand_total, 2) ?></td>
                 </tr>
                 </tfoot>
             </table>
             <input type="hidden" name="grand_total" value="<?= htmlspecialchars($grand_total) ?>">
             <input type="hidden" name="subtotal" value="<?= htmlspecialchars($subtotal) ?>">
+
+            <div class="payment-methods">
+                <h3>Select Payment Method:</h3>
+                <label><input type="radio" name="payment_method" value="payment.php"> Debit/Credit Card</label>
+                <label><input type="radio" name="payment_method" value="tng_payment.php"> Touch 'n Go</label>
+                <label><input type="radio" name="payment_method" value="bank_transfer_payment.php"> Bank Transfer</label>
+            </div>
+
             <div class="confirm-section">
                 <label>
                     <input type="checkbox" id="confirm_order" name="confirm_order">
@@ -92,6 +136,7 @@ $_SESSION['reorder_items'] = $reorderItems;
         </form>
     <?php else: ?>
         <div class="no-items">No items to checkout.</div>
+        <a href="cart.php" class="back-to-cart">Back to Cart</a>
     <?php endif; ?>
 </div>
 </body>

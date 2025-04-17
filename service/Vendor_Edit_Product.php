@@ -1,5 +1,4 @@
 ﻿<?php
-$_SESSION['vendor_id'] = 1;
 use entities\Vendor;
 require_once __DIR__ . '\..\entities\Vendor.php';
 require_once __DIR__ . '\..\dao\VendorDao.php';

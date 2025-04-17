@@ -1,5 +1,4 @@
 <?php
-require_once "Utilities/Connection.php";
 require_once "service/Admin_Task_List.php";
 ?>
 
@@ -26,6 +25,9 @@ require_once "service/Admin_Task_List.php";
 </head>
 <body>
     <h2>Admin - Task List</h2>
+    <a href="admin_add_task.php">
+        <button type="button" style="margin-bottom: 15px;">Add Task</button>
+    </a>
     <table>
         <thead>
             <tr>
@@ -36,6 +38,7 @@ require_once "service/Admin_Task_List.php";
                 <th>Due Date</th>
                 <th>Complete Date</th>
                 <th>Order ID</th>
+                <th>Assigned Staff(s)</th>
             </tr>
         </thead>
         <tbody>
@@ -49,6 +52,7 @@ require_once "service/Admin_Task_List.php";
                     <td><?php echo htmlspecialchars($task['task_due_date']); ?></td>
                     <td><?php echo htmlspecialchars($task['task_done_date'] ?: 'N/A'); ?></td>
                     <td><?php echo htmlspecialchars($task['order_id']); ?></td>
+                    <td><?= htmlspecialchars($task['assigned_staffs']) ?></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>

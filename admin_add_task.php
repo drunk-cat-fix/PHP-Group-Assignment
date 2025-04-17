@@ -83,6 +83,7 @@ require_once 'service/Admin_Add_Task.php';
         });
     
         addStaffBtn.addEventListener("click", function () {
+            console.log("Add staff clicked"); // for debugging
             const selectedValue = assignedStaffSelect.value;
             const selectedText = assignedStaffSelect.options[assignedStaffSelect.selectedIndex].text;
         
@@ -134,6 +135,28 @@ require_once 'service/Admin_Add_Task.php';
             input.value = value;
             input.id = inputId;
             hiddenInputsContainer.appendChild(input);
+        }
+    });
+    document.getElementById("addTaskForm").addEventListener("submit", function(e) {
+        const taskName = document.getElementById("task_name").value.trim();
+        const taskDesc = document.getElementById("task_desc").value.trim();
+        const startDate = document.getElementById("task_start_date").value;
+        const dueDate = document.getElementById("task_due_date").value;
+    
+        if (!taskName || !taskDesc || !startDate || !dueDate) {
+            e.preventDefault();
+            alert("Please fill in all required fields");
+            return;
+        }
+    
+        // Validate dates
+        const start = new Date(startDate);
+        const due = new Date(dueDate);
+    
+        if (due < start) {
+            e.preventDefault();
+            alert("Due date cannot be before start date");
+            return;
         }
     });
     </script>

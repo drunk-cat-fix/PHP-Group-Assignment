@@ -62,7 +62,15 @@ require_once 'service/Product_Details.php';
     <p><strong>Category:</strong> <?= htmlspecialchars($product['product_category']) ?></p>
     <p><strong>Quantity Available:</strong> <?= htmlspecialchars($product['product_qty']) ?></p>
     <p><strong>Packaging:</strong> <?= htmlspecialchars($product['product_packaging']) ?></p>
-    <p class="price">Price: RM <?= number_format($product['product_price'], 2) ?></p>
+    <?php if ($has_promotion): ?>
+        <p class="price">
+            <del style="color: #999;">RM <?= number_format($product['product_price'], 2) ?></del>
+            <span style="color: red; font-weight: bold;">RM <?= number_format($promotion_price, 2) ?></span>
+            <span style="background: #ff0; padding: 2px 6px; border-radius: 3px; font-size: 0.9em;">Promo!</span>
+        </p>
+    <?php else: ?>
+        <p class="price">Price: RM <?= number_format($product['product_price'], 2) ?></p>
+    <?php endif; ?>
     <p><strong>Vendor:</strong> <?= htmlspecialchars($product['vendor_name']) ?></p>
     <p><strong>Rating:</strong> <?= $avg_rating ?></p>
 
@@ -74,6 +82,9 @@ require_once 'service/Product_Details.php';
         </div>
         <input type="hidden" name="product_id" value="<?= $product_id ?>">
         <button type="submit" name="add_to_cart">Add to Cart</button>
+        <?php if(isset($_SESSION['customer_id'])): ?>
+            <button type="submit" name="save_preference" style="background-color: #2196F3; margin-left: 10px;">Save as Preference</button>
+        <?php endif; ?>
     </form>
 
     <!-- Display message if product is added to cart -->

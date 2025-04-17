@@ -15,7 +15,7 @@ function processOrder($customer_id, $grand_total, $items) {
         $conn->beginTransaction();
 
         // 1. Insert into customer_order
-        $stmt = $conn->prepare("INSERT INTO customer_order (customer_id, order_date, order_time, amount) VALUES (?, CURDATE(), CURTIME(), ?)");
+        $stmt = $conn->prepare("INSERT INTO customer_order (customer_id, order_date, order_time, amount, isPending) VALUES (?, CURDATE(), CURTIME(), ?, TRUE)");
         $stmt->execute([$customer_id, $grand_total]);
 
         $order_id = $conn->lastInsertId(); // Get the order_id from the inserted record
@@ -39,7 +39,7 @@ function processOrder($customer_id, $grand_total, $items) {
         unset($_SESSION['cart']); // optional, if needed
 
         // Redirect to order history page
-        header("Location: customer_order_history.php");
+        header("Location: payment_success.php");
         exit;
 
     } catch (Exception $e) {
@@ -48,11 +48,12 @@ function processOrder($customer_id, $grand_total, $items) {
     }
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['card'])) {
-    $customer_id = $_SESSION['customer_id']; // Assuming customer ID is stored in session
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['card']) || isset($_POST['tng']) || isset($_POST['bank']))) {
+    $customer_id = $_SESSION['customer_id'];
     $items = isset($_SESSION['reorder_items']) ? $_SESSION['reorder_items'] : [];
+    $grand_total = isset($_POST['grand_total']) ? floatval($_POST['grand_total']) : 0;
 
-    // Process the order
     processOrder($customer_id, $grand_total, $items);
 }
+
 ?>

@@ -41,50 +41,111 @@ require_once 'service/Staff_Dashboard.php';
         
         function confirmSave() {
             if (confirm("Are you sure you want to save changes?")) {
-                let taskUpdates = [];
+                let taskIds = [];
                 let progressUpdates = [];
 
                 // Get task status updates
                 document.querySelectorAll(".complete-date-select").forEach(select => {
                     if (select.value === "Done") {
                         let taskId = select.closest("tr").querySelector("td:first-child").innerText;
-                        taskUpdates.push(taskId);
+                        taskIds.push(parseInt(taskId));
                     }
                 });
 
                 // Get progress updates
                 document.querySelectorAll(".progress-input").forEach(input => {
                     if (input.dataset.original !== input.value) {
-                        let taskId = input.closest("tr").querySelector("td:first-child").innerText;
                         let orderId = input.dataset.orderid;
                         if (orderId) {
                             progressUpdates.push({
-                                order_id: orderId,
-                                progress: input.value
+                                order_id: parseInt(orderId),
+                                progress: parseInt(input.value)
                             });
                         }
                     }
                 });
 
-                fetch("service/Staff_Dashboard.php", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ 
-                        task_updates: taskUpdates,
-                        progress_updates: progressUpdates
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert("✅ Changes saved successfully!");
-                        location.reload();
-                    } else {
-                        alert("❌ Failed to update tasks.");
-                    }
-                })
-                .catch(error => console.error("Error:", error));
+                // Decide which updates to send
+                if (taskIds.length > 0 && progressUpdates.length > 0) {
+                    // Send both updates in sequence
+                    sendTaskUpdates(taskIds)
+                        .then(result => {
+                            if (result.success) {
+                                return sendProgressUpdates(progressUpdates);
+                            } else {
+                                throw new Error("Failed to update tasks");
+                            }
+                        })
+                        .then(result => {
+                            if (result.success) {
+                                alert("✅ All changes saved successfully!");
+                                location.reload();
+                            } else {
+                                alert("❌ Failed to update progress values.");
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error:", error);
+                            alert("❌ " + error.message);
+                        });
+                } else if (taskIds.length > 0) {
+                    // Send only task updates
+                    sendTaskUpdates(taskIds)
+                        .then(result => {
+                            if (result.success) {
+                                alert("✅ Task status updated successfully!");
+                                location.reload();
+                            } else {
+                                alert("❌ Failed to update tasks.");
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error:", error);
+                            alert("❌ Error updating tasks.");
+                        });
+                } else if (progressUpdates.length > 0) {
+                    // Send only progress updates
+                    sendProgressUpdates(progressUpdates)
+                        .then(result => {
+                            if (result.success) {
+                                alert("✅ Progress values updated successfully!");
+                                location.reload();
+                            } else {
+                                alert("❌ Failed to update progress values.");
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error:", error);
+                            alert("❌ Error updating progress values.");
+                        });
+                } else {
+                    alert("No changes detected to save.");
+                }
             }
+        }
+
+        function sendTaskUpdates(taskIds) {
+            return fetch("service/Staff_Dashboard.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    action: "updateTaskStatus",
+                    taskIds: taskIds
+                })
+            })
+            .then(response => response.json());
+        }
+
+        function sendProgressUpdates(progressUpdates) {
+            return fetch("service/Staff_Dashboard.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    action: "updateDeliveryProgress",
+                    progressUpdates: progressUpdates
+                })
+            })
+            .then(response => response.json());
         }
         
         function cancelChanges() {
@@ -177,7 +238,7 @@ require_once 'service/Staff_Dashboard.php';
                             <?php endif; ?>
                         <?php endif; ?>
                     </td>
-                    <td><?php echo htmlspecialchars($task['staff_name']); ?></td>
+                    <td><?php echo htmlspecialchars($task['assigned_staff']); ?></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>

@@ -8,7 +8,7 @@ require_once 'service/Vegetable.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vegetables</title>
+    <title>Vegetable</title>
     <style>
         .product-grid {
             display: grid;
@@ -25,9 +25,11 @@ require_once 'service/Vegetable.php';
         .product-card img {
             max-width: 100%;
             height: auto;
+            cursor: pointer;
         }
         .product-card h3 {
             margin: 10px 0;
+            cursor: pointer;
         }
         .product-card .price {
             font-size: 1.2em;
@@ -40,21 +42,31 @@ require_once 'service/Vegetable.php';
     </style>
 </head>
 <body>
-
-<h1>Vegetables</h1>
+<h1>Vegetable</h1>
 <div class="product-grid">
     <?php foreach ($products as $product): ?>
         <div class="product-card">
-            <!-- If image exists, display it. If not, show placeholder -->
-            <img src="<?= isset($product['product_profile']) ? 'data:image/jpeg;base64,' . base64_encode($product['product_profile']) : 'path_to_placeholder_image.jpg' ?>" alt="<?= htmlspecialchars($product['product_name']) ?>">
-            <h3><?= htmlspecialchars($product['product_name']) ?></h3>
-            <p class="price">Price: RM <?= number_format($product['product_price'], 2) ?></p>
+            <!-- Clickable image and name that redirects to product_details.php -->
+            <a href="product_details.php?product_id=<?= $product['product_id'] ?>">
+                <img src="<?= isset($product['product_profile']) ? 'data:image/jpeg;base64,' . base64_encode($product['product_profile']) : 'path_to_placeholder_image.jpg' ?>" alt="<?= htmlspecialchars($product['product_name']) ?>">
+            </a>
+            <a href="product_details.php?product_id=<?= $product['product_id'] ?>">
+                <h3><?= htmlspecialchars($product['product_name']) ?></h3>
+            </a>
+            <?php if ($product['promo_price']): ?>
+                <p class="price">
+                    <del style="color: #999;">RM <?= number_format($product['product_price'], 2) ?></del>
+                    <span style="color: red; font-weight: bold;">RM <?= number_format($product['promo_price'], 2) ?></span>
+                </p>
+            <?php else: ?>
+                <p class="price">Price: RM <?= number_format($product['product_price'], 2) ?></p>
+            <?php endif; ?>
             <p class="category">Category: <?= htmlspecialchars($product['product_category']) ?></p>
             <p><?= htmlspecialchars($product['product_desc']) ?></p>
-            <p>Rating: <?= htmlspecialchars($product['product_rating']) ?></p>
+            <p>Rating: <?= $product['avg_rating'] ?></p>
+            <p>Quantity left: <?= htmlspecialchars($product['product_qty']) ?></p>
         </div>
     <?php endforeach; ?>
 </div>
-
 </body>
 </html>
