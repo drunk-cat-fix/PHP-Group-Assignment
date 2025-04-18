@@ -180,23 +180,9 @@ class AdminDao
                 debug_log("Task inserted without order_id");
             }
 
-            $taskID = $conn->lastInsertId();
-            debug_log("Generated task ID: $taskID");
-    
-            // Commit the task creation
             $conn->commit();
             debug_log("Transaction committed for task creation");
-    
-            // Now handle staff assignment
-            if (!empty($assignedStaffs)) {
-                debug_log("Attempting to assign " . count($assignedStaffs) . " staff member(s) to task");
-                $staffAssignResult = $this->assignTask($taskID, $assignedStaffs);
-                debug_log("Staff assignment result: " . ($staffAssignResult ? "SUCCESS" : "FAILED"));
-                return $staffAssignResult;
-            } else {
-                debug_log("No staff to assign, task created successfully without staff");
-                return true;
-            }
+            return true;
 
         } catch (Exception $e) {
             debug_log("ERROR in addTask: " . $e->getMessage());

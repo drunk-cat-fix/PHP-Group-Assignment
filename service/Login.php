@@ -24,7 +24,7 @@ if ($_POST) {
         $vendorDao = new VendorDao();
         if ($vendorDao->isExisted($vendor->getVendorName(),$vendor->getVendorPw())) {
 
-            header('Location: ../index.php');
+            header('Location: ../vendor_manage_order.php');
         }else{
             header('Location: ../login.php?errMsg=Invalid username or password!');
         }
@@ -37,7 +37,7 @@ if ($_POST) {
         $customer->setCustomerPw($_POST['password']);
         $customerDao = new CustomerDao();
         if ($customerDao->isExisted($customer->getCustomerName(),$customer->getCustomerPw())) {
-            header("location: ../index.php");
+            header("location: ../products.php");
         }else{
             header("location: ../login.php?errMsg=Invalid username or password!");
         }
@@ -76,7 +76,7 @@ if ($_POST) {
         $status = $adminDao->isExisted($admin);
 //        print_r($status);
         if ($status) {
-            header("location: ../index.php");
+            header("location: ../admin_manage_order.php");
         } else {
             header("location: ../login.php?errMsg=Invalid username or password!");
         }

@@ -1,6 +1,7 @@
 ﻿<?php
 session_start();
 require_once 'service/Staff_Dashboard.php';
+require_once 'staff_nav.php';
 ?>
 
 <!DOCTYPE html>
@@ -10,24 +11,112 @@ require_once 'service/Staff_Dashboard.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Staff - Task List</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
+
+        thead th {
+            position: sticky;
+            top: 0;
+            background-color: #007BFF;
+            color: white;
+            padding: 10px;
             text-align: left;
+            font-size: 14px;
         }
-        th {
-            background-color: #f2f2f2;
+
+        tbody td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        tbody tr:hover {
+            background-color: #f1f9ff;
+        }
+
+        .progress-input {
+            width: 60px;
+            padding: 4px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        select.complete-date-select {
+            padding: 4px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .complete-date-display[data-status="Done"] {
+            color: green;
+            font-weight: bold;
+        }
+
+        .complete-date-display[data-status="Incomplete"] {
+            color: #cc0000;
+            font-weight: bold;
+        }
+
+        #save-cancel-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #save-cancel-container button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            margin: 0 10px;
+            border-radius: 6px;
             cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #save-cancel-container button:hover {
+            background-color: #0056b3;
         }
         .hidden {
             display: none;
         }
-        .progress-input {
-            width: 60px;
+
+        @media (max-width: 768px) {
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+            thead {
+                display: none;
+            }
+            tbody td {
+                border: none;
+                padding: 10px;
+                position: relative;
+            }
+            tbody td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 10px;
+                font-weight: bold;
+                color: #666;
+            }
         }
     </style>
     <script>
@@ -194,12 +283,12 @@ require_once 'service/Staff_Dashboard.php';
         <tbody>
             <?php foreach ($tasks as $task): ?>
                 <tr>
-                    <td><?php echo htmlspecialchars($task['task_id']); ?></td>
-                    <td><?php echo htmlspecialchars($task['task_name']); ?></td>
-                    <td><?php echo htmlspecialchars($task['task_desc']); ?></td>
-                    <td><?php echo htmlspecialchars($task['task_start_date']); ?></td>
-                    <td><?php echo htmlspecialchars($task['task_due_date']); ?></td>
-                    <td>
+                    <td data-label="Task ID"><?php echo htmlspecialchars($task['task_id']); ?></td>
+                    <td data-label="Task Name"><?php echo htmlspecialchars($task['task_name']); ?></td>
+                    <td data-label="Task Description"><?php echo htmlspecialchars($task['task_desc']); ?></td>
+                    <td data-label="Start Date"><?php echo htmlspecialchars($task['task_start_date']); ?></td>
+                    <td data-label="Due Date"><?php echo htmlspecialchars($task['task_due_date']); ?></td>
+                    <td data-label="Deliver Percent">
                         <?php if (!empty($task['order_id']) && isset($task['deliver_percent'])): ?>
                             <input type="number" class="progress-input" min="0" max="100" 
                                 value="<?php echo htmlspecialchars($task['deliver_percent']); ?>" 
@@ -211,7 +300,7 @@ require_once 'service/Staff_Dashboard.php';
                             -
                         <?php endif; ?>
                     </td>
-                    <td>
+                    <td data-label="Task Done Date">
                         <?php if (!empty($task['task_done_date'])): ?>
                             <?php echo htmlspecialchars($task['task_done_date']); ?>
                         <?php else: ?>
@@ -229,7 +318,7 @@ require_once 'service/Staff_Dashboard.php';
                             <?php endif; ?>
                         <?php endif; ?>
                     </td>
-                    <td><?php echo htmlspecialchars($task['assigned_staff']); ?></td>
+                    <td data-label="Assigned Staff"><?php echo htmlspecialchars($task['assigned_staff']); ?></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>

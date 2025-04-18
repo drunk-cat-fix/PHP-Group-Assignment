@@ -1,6 +1,5 @@
 <?php
 require_once __DIR__ . '/../Utilities/Connection.php';
-$_SESSION['vendor_id'] = 3;
 $vendor_id = $_SESSION['vendor_id'] ?? null;
 
 if (!$vendor_id) {

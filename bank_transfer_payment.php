@@ -10,44 +10,100 @@ $grand_total = $_SESSION['grand_total'] ?? 0;
     <title>Bank Transfer Payment</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 40px;
-            background-color: #f9f9f9;
+            font-family: 'Arial', sans-serif;
+            background-color: #f7f7f7;
+            padding: 50px 10%;
+            margin: 0;
         }
+
+        h2 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        h2 img {
+            margin-right: 15px;
+            height: 120px; /* Increase the height of the logo */
+        }
+
         .payment-box {
-            display: inline-block;
+            background-color: #ffffff;
             padding: 30px;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            background-color: #f2f2f2;
-            width: 400px;
+            border-radius: 12px;
+            border: 1px solid #ddd;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: 0 auto;
         }
+
         .bank-info {
-            margin: 20px 0;
-            text-align: left;
-            line-height: 1.6;
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            font-size: 14px;
         }
+
+        .bank-info p {
+            margin: 8px 0;
+        }
+
+        label {
+            display: block;
+            text-align: left;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
         input[type="text"], input[type="password"] {
             width: 100%;
-            padding: 10px;
-            margin-top: 5px;
+            padding: 12px;
             margin-bottom: 15px;
-            border: 1px solid #ccc;
+            border: 1px solid #ddd;
             border-radius: 5px;
-        }
-        label {
-            float: left;
-            font-weight: bold;
-        }
-        .btn-next {
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
             font-size: 16px;
-            cursor: pointer;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+
+        .btn-next {
+            padding: 12px 20px;
+            background-color: #FDB813; /* Maybank Yellow */
+            color: white;
+            font-size: 18px;
+            border: none;
             border-radius: 5px;
+            width: 100%;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-next:hover {
+            background-color: #ffb700; /* Slightly darker yellow on hover */
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            body {
+                padding: 30px 5%;
+            }
+
+            .payment-box {
+                padding: 20px;
+            }
+
+            h2 {
+                font-size: 24px;
+            }
         }
     </style>
     <script>
@@ -66,11 +122,14 @@ $grand_total = $_SESSION['grand_total'] ?? 0;
 </head>
 <body>
     <div class="payment-box">
-        <h2>Bank Transfer Payment</h2>
+        <h2>
+            <img src="https://vectorise.net/logo/wp-content/uploads/2011/09/2011maybanklogo.png" alt="Maybank Logo">
+            Bank Transfer Payment
+        </h2>
 
         <div class="bank-info">
             <p><strong>Bank Name:</strong> Maybank</p>
-            <p><strong>Account Name:</strong> MyCompany Sdn Bhd</p>
+            <p><strong>Account Name:</strong> AgriMarket Solutions Sdn Bhd</p>
             <p><strong>Account Number:</strong> 1234-5678-9012</p>
         </div>
 

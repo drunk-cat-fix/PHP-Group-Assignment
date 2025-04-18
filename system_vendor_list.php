@@ -1,6 +1,11 @@
 ﻿<?php
 session_start();
 require_once 'service/System_Vendor_List.php';
+if ($_SESSION['admin_id'] != NULL) {
+require_once 'admin_nav.php';
+} else if ($_SESSION['staff_id'] != NULL) {
+require_once 'staff_nav.php';
+}
 ?>
 
 <!DOCTYPE html>
@@ -10,38 +15,117 @@ require_once 'service/System_Vendor_List.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Manage Vendors</title>
     <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 300px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
         }
+
         th, td {
             border: 1px solid #ddd;
-            padding: 8px;
+            padding: 15px;
             text-align: left;
         }
+
         th {
-            background-color: #f2f2f2;
+            background-color: #4CAF50;
+            color: white;
+            font-weight: bold;
         }
-        img {
+
+        td {
+            font-size: 14px;
+        }
+
+        td img {
             width: 50px;
             height: 50px;
             object-fit: cover;
+            border-radius: 5px;
         }
+
         .action-buttons {
             display: none;
             margin-top: 10px;
         }
+
+        .action-buttons button {
+            padding: 6px 12px;
+            margin: 0 5px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        .action-buttons button:hover {
+            background-color: #ddd;
+        }
+
+        button.delete-btn {
+            background-color: #f44336;
+            color: white;
+        }
+
+        button.save-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        button.cancel-btn {
+            background-color: #888;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        @media (max-width: 768px) {
+            th, td {
+                padding: 10px;
+            }
+
+            input[type="text"] {
+                max-width: 100%;
+            }
+        }
     </style>
     <script>
         function showButtons(vendorId) {
-            // Only show the buttons for the specific vendor
             document.getElementById("action-buttons_" + vendorId).style.display = "block";
         }
 
         function saveChanges(vendorId) {
             var tier = document.getElementById("tier_" + vendorId).value;
-
-            // Send the updated vendor tier via AJAX
             var xhr = new XMLHttpRequest();
             xhr.open("POST", "service/System_Vendor_List.php", true);
             xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -57,11 +141,10 @@ require_once 'service/System_Vendor_List.php';
         }
 
         function cancelChanges(vendorId) {
-            // Hide just this vendor's action buttons
             document.getElementById("action-buttons_" + vendorId).style.display = "none";
-            // Reload the page to reset any changes
             location.reload();
         }
+
         function deleteVendor(vendorId) {
             if (confirm("Are you sure you want to delete this vendor?")) {
                 var xhr = new XMLHttpRequest();
@@ -70,7 +153,7 @@ require_once 'service/System_Vendor_List.php';
                 xhr.onload = function () {
                     if (xhr.status === 200) {
                         alert("✅ " + xhr.responseText);
-                        location.reload(); // Reload page to reflect deletion
+                        location.reload();
                     } else {
                         alert("❌ Failed to delete vendor.");
                     }
@@ -78,15 +161,15 @@ require_once 'service/System_Vendor_List.php';
                 xhr.send("deleteVendorId=" + vendorId);
             }
         }
+
         function filterTable() {
             var input = document.getElementById("searchInput");
             var filter = input.value.toLowerCase();
             var table = document.querySelector("table");
             var tr = table.getElementsByTagName("tr");
 
-            // Loop through table rows (start from 1 to skip the header)
             for (var i = 1; i < tr.length; i++) {
-                var td = tr[i].getElementsByTagName("td")[1]; // Vendor Name is column index 1
+                var td = tr[i].getElementsByTagName("td")[1];
                 if (td) {
                     var txtValue = td.textContent || td.innerText;
                     tr[i].style.display = txtValue.toLowerCase().includes(filter) ? "" : "none";
@@ -97,7 +180,7 @@ require_once 'service/System_Vendor_List.php';
 </head>
 <body>
     <h2>Admin - Manage Vendors</h2>
-    <input type="text" id="searchInput" placeholder="Search by vendor name..." onkeyup="filterTable()" style="margin-bottom: 15px; padding: 8px; width: 300px;">
+    <input type="text" id="searchInput" placeholder="Search by vendor name..." onkeyup="filterTable()">
     <table>
         <thead>
             <tr>
@@ -132,28 +215,24 @@ require_once 'service/System_Vendor_List.php';
                             <option <?php echo ($vendor['vendor_tier'] == 'Gold') ? 'selected' : ''; ?>>Gold</option>
                         </select>
                         <div id="action-buttons_<?php echo $vendor['vendor_id']; ?>" class="action-buttons">
-                            <button onclick="saveChanges(<?php echo $vendor['vendor_id']; ?>)">Save</button>
-                            <button onclick="cancelChanges(<?php echo $vendor['vendor_id']; ?>)">Cancel</button>
+                            <button class="save-btn" onclick="saveChanges(<?php echo $vendor['vendor_id']; ?>)">Save</button>
+                            <button class="cancel-btn" onclick="cancelChanges(<?php echo $vendor['vendor_id']; ?>)">Cancel</button>
                         </div>
                     </td>
                     <td><?php echo $vendor['vendor_visit_count']; ?></td>
                     <td>
                         <?php
-                        // Check if the profile image exists and is a valid BLOB, convert it to base64
                         if (!empty($vendor['vendor_profile'])) {
-                            // Convert BLOB to base64 string
                             $imageData = base64_encode($vendor['vendor_profile']);
-                            // Output the image as a data URL in the img tag
                             echo '<img src="data:image/jpeg;base64,' . $imageData . '" alt="Vendor Image">';
                         } else {
-                            // Show a placeholder image if no profile is available
                             echo '<img src="placeholder.jpg" alt="Vendor Image">';
                         }
                         ?>
                     </td>
                     <td><?php echo $vendor['vendor_email']; ?></td>
                     <td>
-                        <button onclick="deleteVendor(<?php echo $vendor['vendor_id']; ?>)">Delete</button>
+                        <button class="delete-btn" onclick="deleteVendor(<?php echo $vendor['vendor_id']; ?>)">Delete</button>
                     </td>
                 </tr>
             <?php endforeach; ?>

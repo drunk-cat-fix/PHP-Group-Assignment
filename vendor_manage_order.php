@@ -1,9 +1,7 @@
 ﻿<?php
 session_start();
-$_SESSION['vendor_id'] = 3;
 require_once 'service/Vendor_Manage_Order.php';
-require_once 'service/Vendor_Notification.php';
-$notificationCount = count($notifications);
+require_once 'vendor_nav.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -12,85 +10,117 @@ $notificationCount = count($notifications);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vendor - View Orders</title>
     <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        .vendor-orders-wrapper {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .vendor-orders-wrapper h2 {
+            color: #333;
             margin-bottom: 20px;
         }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
+
+        .vendor-orders-wrapper table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .vendor-orders-wrapper th, 
+        .vendor-orders-wrapper td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e9ecef;
             text-align: left;
         }
-        th {
-            background-color: #f2f2f2;
+
+        .vendor-orders-wrapper th {
+            background-color: #f1f3f5;
+            color: #495057;
         }
-        .hidden {
-            display: none;
+
+        .vendor-orders-wrapper tr:hover {
+            background-color: #f8f9fa;
         }
-        .action-btn {
-            font-size: 20px;
+
+        .vendor-orders-wrapper .action-btn {
+            font-size: 18px;
             cursor: pointer;
             border: none;
             background: none;
             margin: 0 5px;
+            transition: transform 0.1s ease-in-out;
         }
-        .debug-container {
-            background-color: #f8f8f8;
-            border: 1px solid #ddd;
-            padding: 10px;
+
+        .vendor-orders-wrapper .action-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .vendor-orders-wrapper .hidden {
+            display: none;
+        }
+
+        .vendor-orders-wrapper #save-cancel-container {
             margin-top: 20px;
+        }
+
+        .vendor-orders-wrapper #save-cancel-container button {
+            padding: 8px 14px;
+            margin-right: 10px;
+            font-size: 14px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .vendor-orders-wrapper #save-cancel-container button:last-child {
+            background-color: #6c757d;
+        }
+
+        .vendor-orders-wrapper .debug-container {
+            background-color: #fff;
+            border: 1px solid #ced4da;
+            padding: 10px;
+            margin-top: 30px;
             max-height: 300px;
             overflow-y: auto;
-        }
-        .debug-message {
-            margin: 5px 0;
+            border-radius: 6px;
             font-family: monospace;
+            font-size: 13px;
+            color: #495057;
         }
-        .notification {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 24px;
-            cursor: pointer;
-        }
-        .notification .badge {
-            position: absolute;
-            top: -10px;
-            right: -10px;
-            padding: 5px 8px;
-            border-radius: 50%;
-            background: red;
-            color: white;
-            font-size: 12px;
+
+        .vendor-orders-wrapper .no-orders {
+            color: #777;
+            font-size: 16px;
+            padding: 20px;
+            text-align: center;
         }
     </style>
     <script>
         function handleAccept(button, orderId) {
-            // Show the confirm button container
             document.getElementById("save-cancel-container").classList.remove("hidden");
-            
-            // Store the order ID in the hidden input field for form submission
             document.getElementById("order_id").value = orderId;
-            
-            // Change the action cell text
             const actionCell = button.parentElement;
             actionCell.innerHTML = "✅ Accepted";
         }
 
         function handleDeny(button, orderId) {
             const reason = prompt("Please enter the reason for denial:");
-            if (reason) {
-                if (confirm("Are you sure you want to deny this order?")) {
-                    document.getElementById("deny_order_id").value = orderId;
-                    document.getElementById("deny_reason").value = reason;
-                    document.getElementById("deny-form").submit();
-                }
+            if (reason && confirm("Are you sure you want to deny this order?")) {
+                document.getElementById("deny_order_id").value = orderId;
+                document.getElementById("deny_reason").value = reason;
+                document.getElementById("deny-form").submit();
             }
         }
 
         function confirmSave() {
-            if (confirm("Are you sure you want to save this change? This will mark the order as complete and update product quantities.")) {
+            if (confirm("Confirm order completion and update product quantities?")) {
                 document.getElementById("update-form").submit();
             }
         }
@@ -98,68 +128,69 @@ $notificationCount = count($notifications);
         function cancelChanges() {
             location.reload();
         }
-        
+
         function toggleDebug() {
             const debugContainer = document.getElementById("debug-container");
-            if (debugContainer.classList.contains("hidden")) {
-                debugContainer.classList.remove("hidden");
-            } else {
-                debugContainer.classList.add("hidden");
-            }
+            debugContainer.classList.toggle("hidden");
         }
     </script>
 </head>
 <body>
-    <a href="vendor_notifications_page.php" class="notification">
-        🔔<span class="badge"><?= $notificationCount ?></span>
-    </a>
-    <h2>Vendor - View Orders</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Order ID</th>
-                <th>Products</th>
-                <th>Action</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if (!empty($result)): ?>
-                <?php foreach ($result as $row): ?>
-                    <tr>
-                        <td><?php echo $row['order_id']; ?></td>
-                        <td><?php echo htmlspecialchars($row['products_info']); ?></td>
-                        <td>
-                            <?php if ($row['status'] !== 'Complete' && $row['status'] !== 'Denied'): ?>
-                                <button class="action-btn" onclick="handleAccept(this, <?php echo $row['order_id']; ?>)">✅</button>
-                                <button class="action-btn" onclick="handleDeny(this, <?php echo $row['order_id']; ?>)">❌</button>
-                            <?php else: ?>
-                                <?php echo "-"; ?>
-                            <?php endif; ?>
-                        </td>
-                        <td class="status-cell"><?php echo htmlspecialchars($row['status']); ?></td>
-                    </tr>
-                <?php endforeach; ?>
-            <?php else: ?>
+    <div class="vendor-orders-wrapper">
+        <h2>📋 View Orders</h2>
+
+        <table>
+            <thead>
                 <tr>
-                    <td colspan="4">No orders found</td>
+                    <th>Order ID</th>
+                    <th>Products</th>
+                    <th>Action</th>
+                    <th>Status</th>
                 </tr>
-            <?php endif; ?>
-        </tbody>
-    </table>
-    
-    <div id="save-cancel-container" class="hidden">
-        <form id="update-form" method="POST">
-            <input type="hidden" name="action" value="update_status">
-            <input type="hidden" id="order_id" name="order_id" value="">
-        </form>
-        <form id="deny-form" method="POST">
-            <input type="hidden" name="action" value="deny_order">
-            <input type="hidden" id="deny_order_id" name="order_id" value="">
-            <input type="hidden" id="deny_reason" name="reason" value="">
-        </form>
-        <button onclick="confirmSave()">Confirm</button>
-        <button onclick="cancelChanges()">Cancel</button>
+            </thead>
+            <tbody>
+                <?php if (!empty($result)): ?>
+                    <?php foreach ($result as $row): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($row['order_id']) ?></td>
+                            <td><?= htmlspecialchars($row['products_info']) ?></td>
+                            <td>
+                                <?php if ($row['status'] !== 'Complete' && $row['status'] !== 'Denied'): ?>
+                                    <button class="action-btn" onclick="handleAccept(this, <?= $row['order_id'] ?>)">✅</button>
+                                    <button class="action-btn" onclick="handleDeny(this, <?= $row['order_id'] ?>)">❌</button>
+                                <?php else: ?>
+                                    -
+                                <?php endif; ?>
+                            </td>
+                            <td><?= htmlspecialchars($row['status']) ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="4" class="no-orders">No orders found</td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+
+        <div id="save-cancel-container" class="hidden">
+            <form id="update-form" method="POST">
+                <input type="hidden" name="action" value="update_status">
+                <input type="hidden" id="order_id" name="order_id" value="">
+            </form>
+            <form id="deny-form" method="POST">
+                <input type="hidden" name="action" value="deny_order">
+                <input type="hidden" id="deny_order_id" name="order_id" value="">
+                <input type="hidden" id="deny_reason" name="reason" value="">
+            </form>
+            <button onclick="confirmSave()">Confirm</button>
+            <button onclick="cancelChanges()">Cancel</button>
+        </div>
+
+        <!-- Optional: Debug section -->
+        <div id="debug-container" class="debug-container hidden">
+            <!-- Debug messages can go here -->
+        </div>
     </div>
 </body>
 </html>

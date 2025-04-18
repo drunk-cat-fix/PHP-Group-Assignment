@@ -1,6 +1,5 @@
 ﻿<?php
 require_once __DIR__ . '/../Utilities/Connection.php';
-$_SESSION['vendor_id'] = 1;
 $conn = getConnection();
 $vendor_id = $_SESSION['vendor_id'] ?? null;
 

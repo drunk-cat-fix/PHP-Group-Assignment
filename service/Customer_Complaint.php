@@ -1,6 +1,5 @@
 <?php
 require_once __DIR__ . '/../Utilities/Connection.php';
-$_SESSION['customer_id'] = 1;
 $conn = getConnection();
 $customer_id = $_SESSION['customer_id'] ?? null;
 $error = '';

@@ -2,56 +2,72 @@
 session_start();
 require_once 'service/System_Product.php';
 
-// Handle search when the form is submitted
-$searchTerm = isset($_GET['search']) ? trim($_GET['search']) : '';
-$filteredProducts = array_filter($products, function ($product) use ($searchTerm) {
-    return stripos($product['product_name'], $searchTerm) !== false;
-});
-?>
+if ($_SESSION['admin_id'] != NULL) {
+require_once 'admin_nav.php';
+} else if ($_SESSION['staff_id'] != NULL) {
+require_once 'staff_nav.php';
+}
 
+$searchTerm = isset($_GET['search']) ? trim($_GET['search']) : '';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Manage Products</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
+        body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h2 { margin-bottom: 20px; }
+
+        #searchBar {
+            padding: 8px;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed;
         }
+
         th, td {
             border: 1px solid #ddd;
-            padding: 8px;
+            padding: 10px;
             text-align: left;
+            word-wrap: break-word;
+            vertical-align: top;
+        }
+
+        th {
+            background-color: #f0f0f0;
             cursor: pointer;
         }
-        th {
-            background-color: #f2f2f2;
+
+        tr:hover {
+            background-color: #f9f9f9;
         }
-        img {
-            width: 50px;
-            height: 50px;
-            object-fit: cover;
+
+        .star {
+            color: gold;
         }
-        .hidden {
-            display: none;
-        }
-        #searchBar {
-            margin-bottom: 10px;
-            padding: 8px;
-            width: 300px;
+
+        .star-grey {
+            color: #ccc;
         }
     </style>
     <script>
-        let sortOrder = {}; // Store sorting state per column
+        let sortOrder = {};
 
         function sortTable(columnIndex) {
             const table = document.getElementById("productTable");
-            const tbody = table.getElementsByTagName("tbody")[0];
-            const rows = Array.from(tbody.getElementsByTagName("tr"));
+            const tbody = table.querySelector("tbody");
+            const rows = Array.from(tbody.querySelectorAll("tr"));
 
-            // Toggle sorting order
             sortOrder[columnIndex] = !sortOrder[columnIndex];
             const ascending = sortOrder[columnIndex];
 
@@ -59,7 +75,6 @@ $filteredProducts = array_filter($products, function ($product) use ($searchTerm
                 let cellA = rowA.cells[columnIndex].innerText.trim();
                 let cellB = rowB.cells[columnIndex].innerText.trim();
 
-                // Remove currency symbols or other non-numeric characters for price columns
                 cellA = cellA.replace(/[^0-9.-]+/g, '');
                 cellB = cellB.replace(/[^0-9.-]+/g, '');
 
@@ -69,70 +84,58 @@ $filteredProducts = array_filter($products, function ($product) use ($searchTerm
                 return ascending ? (a > b ? 1 : -1) : (a < b ? 1 : -1);
             });
 
-            // Reattach rows
             tbody.innerHTML = "";
             sortedRows.forEach(row => tbody.appendChild(row));
         }
 
-        function handleSearchKey(event) {
-            if (event.key === 'Enter') {
-                const searchValue = document.getElementById('searchBar').value;
-                window.location.href = '?search=' + encodeURIComponent(searchValue);
-            }
+        function filterTable() {
+            const filter = document.getElementById('searchBar').value.toLowerCase();
+            document.querySelectorAll('#productTable tbody tr').forEach(row => {
+                const name = row.cells[1].textContent.toLowerCase();
+                row.style.display = name.includes(filter) ? '' : 'none';
+            });
         }
     </script>
 </head>
 <body>
-    <h2>Admin - Manage Products</h2>
-    
-    <!-- Search Bar -->
-    <input type="text" id="searchBar" placeholder="Search by product name..." 
-           value="<?php echo htmlspecialchars($searchTerm); ?>" 
-           onkeypress="handleSearchKey(event)">
+    <div class="container">
+        <h2>Admin - Manage Products</h2>
+        <input type="text" id="searchBar" placeholder="Search by product name..." onkeyup="filterTable()" value="<?= htmlspecialchars($searchTerm) ?>">
 
-    <table id="productTable">
-        <thead>
-            <tr>
-                <th onclick="sortTable(0)">Product ID</th>
-                <th onclick="sortTable(1)">Product Name</th>
-                <th>Description</th>
-                <th onclick="sortTable(3)">Vendor Name</th>
-                <th onclick="sortTable(4)">Category</th>
-                <th onclick="sortTable(5)">Quantity</th>
-                <th onclick="sortTable(6)">Packaging</th>
-                <th onclick="sortTable(7)">Price</th>
-                <th onclick="sortTable(8)">Rating</th>
-                <th onclick="sortTable(9)">Visit Count</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            foreach ($filteredProducts as $product): ?>
+        <table id="productTable">
+            <thead>
                 <tr>
-                    <td><?php echo $product['product_id']; ?></td>
-                    <td><?php echo htmlspecialchars($product['product_name']); ?></td>
-                    <td><?php echo htmlspecialchars($product['product_desc']); ?></td>
-                    <td><?php echo htmlspecialchars($product['vendor_name']); ?></td>
-                    <td><?php echo htmlspecialchars($product['product_category']); ?></td>
-                    <td><?php echo $product['product_qty']; ?></td>
-                    <td><?php echo htmlspecialchars($product['product_packaging']); ?></td>
-                    <td>$<?php echo number_format($product['product_price'], 2); ?></td>
+                    <th onclick="sortTable(0)">ID</th>
+                    <th onclick="sortTable(1)">Name</th>
+                    <th onclick="sortTable(2)">Description</th>
+                    <th onclick="sortTable(3)">Category</th>
+                    <th onclick="sortTable(4)">Quantity</th>
+                    <th onclick="sortTable(5)">Packaging</th>
+                    <th onclick="sortTable(6)">Price</th>
+                    <th onclick="sortTable(7)">Rating</th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php foreach ($products as $product): ?>
+                <tr>
+                    <td><?= $product['product_id'] ?></td>
+                    <td><?= htmlspecialchars($product['product_name']) ?></td>
+                    <td><?= htmlspecialchars($product['product_desc']) ?></td>
+                    <td><?= htmlspecialchars($product['product_category']) ?></td>
+                    <td><?= $product['product_qty'] ?></td>
+                    <td><?= htmlspecialchars($product['product_packaging']) ?></td>
+                    <td>$<?= number_format($product['product_price'], 2) ?></td>
                     <td>
-                        <?php
-                        $rating = isset($product['avg_rating']) ? round($product['avg_rating']) : 0;
-                        for ($i = 1; $i <= 5; $i++) {
-                            if ($i <= $rating) {
-                                echo '<span style="color: gold;">&#9733;</span>'; // Filled star
-                            } else {
-                                echo '<span style="color: #ccc;">&#9734;</span>'; // Empty star
-                            }
-                        }
-                        ?>
+                        <?php if (is_numeric($product['avg_rating'])): ?>
+                            <?= number_format($product['avg_rating'], 1) ?>
+                        <?php else: ?>
+                            No ratings
+                        <?php endif; ?>
                     </td>
-                    <td><?php echo $product['product_visit_count']; ?></td>
                 </tr>
             <?php endforeach; ?>
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
 </body>
 </html>

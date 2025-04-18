@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once 'service/Checkout.php';
+require_once 'nav.php';
 $_SESSION['reorder_items'] = $reorderItems;
 $_SESSION['grand_total'] = $grand_total;
 ?>
@@ -11,15 +12,15 @@ $_SESSION['grand_total'] = $grand_total;
     <title>Checkout</title>
     <style>
         body { font-family: Arial, sans-serif; padding: 20px; background: #f7f7f7; }
-        .container { max-width: 1000px; margin: 0 auto; background: #fff; padding: 30px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        h2 { margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        .container { max-width: 900px; margin: auto; padding: 30px; border-radius: 12px; margin-left: 300px; }
+        h2 { margin-bottom: 20px; margin-left: 500px}
+        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; margin-left: 150px}
         th, td { padding: 12px 15px; border: 1px solid #ddd; text-align: left; }
         th { background-color: #f0f0f0; }
         .total-row td { font-weight: bold; background-color: #f9f9f9; }
         .no-items { padding: 20px; color: red; text-align: center; }
         .confirm-section { margin-top: 30px; }
-        .confirm-section label { font-weight: bold; }
+        .confirm-section label { font-weight: bold; margin-left: 150px}
         .btn-checkout {
             background-color: #28a745;
             color: white;
@@ -29,6 +30,7 @@ $_SESSION['grand_total'] = $grand_total;
             border-radius: 4px;
             cursor: pointer;
             margin-top: 10px;
+            margin-left: 150px
         }
         .back-to-cart {
             display: inline-block;
@@ -41,6 +43,7 @@ $_SESSION['grand_total'] = $grand_total;
         }
         .payment-methods {
             margin: 20px 0;
+            margin-left: 150px
         }
         .payment-methods label {
             display: block;

@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once 'nav.php';
 require_once 'service/Customer_Account_Settings.php';
 ?>
 <!DOCTYPE html>
@@ -76,7 +77,7 @@ require_once 'service/Customer_Account_Settings.php';
         <div class="invalid-feedback">Passwords must match and cannot be empty.</div>
       </div>
 
-      <button type="submit" class="btn btn-primary">Update Account</button>
+      <button type="submit" class="btn btn-primary">Update Account</button> <br /> <br /> <br /> <br />
     </form>
   </div>
 

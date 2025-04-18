@@ -25,7 +25,7 @@ $ongoingOrdersQuery = "
     SELECT order_id, customer_id, order_date, order_time, amount, deliver_date, deliver_percent, deliver_status
     FROM customer_order
     WHERE deliver_status = 'In Progress'
-    OR (deliver_status = 'Complete' AND deliver_date >= CURDATE() - INTERVAL 30 DAY)
+    OR (deliver_status = 'Complete' AND deliver_date >= CURDATE() - INTERVAL 30 DAY) ORDER BY order_id DESC
 ";
 $ongoingOrdersStmt = $conn->prepare($ongoingOrdersQuery);
 $ongoingOrdersStmt->execute();

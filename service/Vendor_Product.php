@@ -2,8 +2,9 @@
 require_once __DIR__ . '/../entities/Vendor.php';
 require_once __DIR__ . '/../dao/VendorDao.php';
 require_once __DIR__ . '/../Utilities/Connection.php';
-
+session_start();
 $conn = getConnection();
+$vendor_id = $_SESSION['vendor_id'];
 
 // Check content type for JSON data
 $contentType = isset($_SERVER["CONTENT_TYPE"]) ? trim($_SERVER["CONTENT_TYPE"]) : '';

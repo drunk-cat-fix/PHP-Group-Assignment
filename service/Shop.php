@@ -60,16 +60,8 @@ if (!empty($query)) {
     $params[':query'] = '%' . $query . '%';
 }
 
-$product_sql .= " ORDER BY 
-                    CASE v.vendor_tier
-                        WHEN 'Gold' THEN 1
-                        WHEN 'Silver' THEN 2
-                        WHEN 'Bronze' THEN 3
-                        ELSE 4
-                    END,
-                    CASE WHEN p.product_promotion IS NOT NULL THEN 0 ELSE 1 END,
-                    p.product_visit_count DESC,
-                    p.product_name ASC";
+// Remove ORDER BY for debugging
+$product_sql .= " ORDER BY p.product_id ASC"; // Simplified for testing
 
 $product_stmt = $conn->prepare($product_sql);
 $product_stmt->execute($params);

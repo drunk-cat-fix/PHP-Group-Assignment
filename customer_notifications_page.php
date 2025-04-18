@@ -1,6 +1,7 @@
 ﻿<?php
 session_start();
 require_once 'service/Customer_Notification.php';
+require_once 'nav.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">

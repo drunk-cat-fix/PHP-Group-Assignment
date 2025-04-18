@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once 'nav.php';
 require_once 'service/Cart.php';
 ?>
 <!DOCTYPE html>
@@ -11,9 +12,9 @@ require_once 'service/Cart.php';
     <style>
         /* Cart page styling */
         body { font-family: 'Segoe UI', sans-serif; background-color: #f9f9f9; margin: 0; padding: 20px; }
-        .container { max-width: 900px; margin: auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        h1 { text-align: center; color: #2e7d32; }
-        .cart-table { width: 100%; border-collapse: collapse; margin-top: 30px; }
+        .container { max-width: 900px; margin: auto; padding: 30px; border-radius: 12px; margin-left: 300px; }
+        h1 { text-align: center; color: #2e7d32; margin-left: 300px; }
+        .cart-table { width: 100%; border-collapse: collapse; margin-top: 30px; margin-left: 150px}
         .cart-table th, .cart-table td { padding: 14px; text-align: center; border-bottom: 1px solid #ccc; }
         .cart-table th { background-color: #e8f5e9; color: #2e7d32; }
         .cart-table input[type="number"] { width: 70px; padding: 6px; }
@@ -22,9 +23,9 @@ require_once 'service/Cart.php';
         .remove-btn { background-color: #e53935; color: #fff; }
         .continue-btn, .pay-btn { background-color: #4caf50; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 6px; display: inline-block; transition: background-color 0.3s ease; }
         .continue-btn:hover, .pay-btn:hover { background-color: #388e3c; }
-        .empty-message { text-align: center; color: #888; margin-top: 40px; font-size: 1.2rem; }
+        .empty-message { text-align: center; color: #888; margin-top: 40px; font-size: 1.2rem; margin-left: 300px}
         #toast { position: fixed; bottom: 20px; right: 20px; background: rgba(0,0,0,0.8); color: #fff; padding: 14px 20px; border-radius: 12px; opacity: 0; transition: opacity 0.3s ease; z-index: 999; }
-        .buttons-container { text-align: center; margin-top: 20px; }
+        .buttons-container { text-align: center; margin-top: 20px; margin-left: 300px;}
     </style>
 </head>
 <body>

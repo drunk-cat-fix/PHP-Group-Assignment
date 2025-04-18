@@ -17,7 +17,7 @@ if (!$customer_id) {
 $conn = getConnection();
 
 // Fetch product details
-$stmt = $conn->prepare("SELECT product_name, product_profile FROM product WHERE product_id = ?");
+$stmt = $conn->prepare("SELECT product_name, product_category, product_profile FROM product WHERE product_id = ?");
 $stmt->execute([$product_id]);
 $product = $stmt->fetch(PDO::FETCH_ASSOC);
 

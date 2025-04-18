@@ -103,7 +103,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $action = $adminDao->addTask($admin);
         
         if ($action) {
-            debug_log("Task added successfully, redirecting to task list");
+            debug_log("Task added successfully, retrieving task ID...");
+    
+            // Artificial 1-second delay
+            sleep(1);
+    
+            // Retrieve the latest task ID using a custom query
+            $taskIdQuery = "SELECT task_id FROM task ORDER BY task_id DESC LIMIT 1";
+            $stmt = $conn->prepare($taskIdQuery);
+            $stmt->execute();
+            $taskId = $stmt->fetchColumn();
+    
+            if ($taskId) {
+                debug_log("Latest task ID retrieved: " . $taskId);
+            } else {
+                debug_log("Failed to retrieve the latest task ID.");
+                header("Location: ../admin_add_task.php?errMsg=Failed to retrieve task ID");
+                exit;
+            }
+    
+            // Insert into staff_task for each assigned staff
+            $insertStmt = $conn->prepare("INSERT INTO staff_task (staff_id, task_id) VALUES (?, ?)");
+    
+            foreach ($assignedStaff as $staffId) {
+                $insertStmt->execute([$staffId, $taskId]);
+                debug_log("Assigned staff ID $staffId to task ID $taskId");
+            }
+
+            debug_log("All assigned staff linked, redirecting to task list");
             header("Location: ../admin_task_list.php");
             exit;
         } else {

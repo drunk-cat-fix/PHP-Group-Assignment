@@ -1,48 +1,140 @@
-<?php
+﻿<?php
 session_start();
 require_once 'service/Admin_Analytics.php';
+require_once 'admin_nav.php';
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Admin Analytics</title>
+    <title>Admin Analytics Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        h2 { margin-top: 50px; }
-        canvas { margin: 20px 0; max-width: 600px; }
-        body { font-family: Arial, sans-serif; padding: 20px; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f5f6fa;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #2c3e50;
+        }
+
+        section {
+            margin-bottom: 60px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #34495e;
+            margin-bottom: 20px;
+            border-left: 6px solid #3498db;
+            padding-left: 12px;
+        }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .chart-card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .chart-card h2 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: #2c3e50;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: 300px !important;
+        }
     </style>
 </head>
 <body>
-    <h1>Admin Analytics Dashboard</h1>
+    <div class="container">
+        <h1>Admin Analytics Dashboard</h1>
 
-    <h2>Most Viewed Products</h2>
-    <canvas id="viewedChart"></canvas>
+        <!-- Product Analytics -->
+        <section>
+            <div class="section-title">📦 Product Analytics</div>
+            <div class="chart-grid">
+                <div class="chart-card">
+                    <h2>Most Viewed Products</h2>
+                    <canvas id="viewedChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h2>Most Searched Products</h2>
+                    <canvas id="searchedChart"></canvas>
+                </div>
+            </div>
+        </section>
 
-    <h2>Most Searched Products</h2>
-    <canvas id="searchedChart"></canvas>
+        <!-- Shop Analytics -->
+        <section>
+            <div class="section-title">🏪 Shop Analytics</div>
+            <div class="chart-grid">
+                <div class="chart-card">
+                    <h2>Most Visited Shops</h2>
+                    <canvas id="shopViewedChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h2>Most Searched Shops</h2>
+                    <canvas id="shopSearchedChart"></canvas>
+                </div>
+            </div>
+        </section>
 
-    <h2>Most Visited Shops</h2>
-    <canvas id="shopViewedChart"></canvas>
+        <!-- Product Sales -->
+        <section>
+            <div class="section-title">📈 Product Sales</div>
+            <div class="chart-grid">
+                <div class="chart-card">
+                    <h2>Most Ordered Products</h2>
+                    <canvas id="orderedChart"></canvas>
+                </div>
+            </div>
+        </section>
 
-    <h2>Most Searched Shops</h2>
-    <canvas id="shopSearchedChart"></canvas>
-
-    <h2>Most Ordered Products</h2>
-    <canvas id="orderedChart"></canvas>
-
-    <h2>Weekly Sales</h2>
-    <canvas id="weeklyChart"></canvas>
-
-    <h2>Monthly Sales</h2>
-    <canvas id="monthlyChart"></canvas>
-
-    <h2>Quarterly Sales</h2>
-    <canvas id="quarterlyChart"></canvas>
-
-    <h2>Annual Sales</h2>
-    <canvas id="annuallyChart"></canvas>
+        <!-- Sales Report -->
+        <section>
+            <div class="section-title">💰 Sales Report</div>
+            <div class="chart-grid">
+                <div class="chart-card">
+                    <h2>Weekly Sales</h2>
+                    <canvas id="weeklyChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h2>Monthly Sales</h2>
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h2>Quarterly Sales</h2>
+                    <canvas id="quarterlyChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h2>Annual Sales</h2>
+                    <canvas id="annuallyChart"></canvas>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
 
     <script>
         function createBarChart(id, labels, data, label, bg = 'rgba(54, 162, 235, 0.6)') {
@@ -58,6 +150,7 @@ require_once 'service/Admin_Analytics.php';
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     scales: {
                         y: { beginAtZero: true }
                     }
@@ -75,11 +168,12 @@ require_once 'service/Admin_Analytics.php';
                         data: data,
                         fill: false,
                         borderColor: bg,
-                        tension: 0.1
+                        tension: 0.3
                     }]
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
                     scales: {
                         y: { beginAtZero: true }
                     }
@@ -98,5 +192,4 @@ require_once 'service/Admin_Analytics.php';
         createBarChart("quarterlyChart", <?= jsonData($quarterly, 'quarter') ?>, <?= jsonData($quarterly, 'total') ?>, "Quarterly Sales");
         createBarChart("annuallyChart", <?= jsonData($annually, 'year') ?>, <?= jsonData($annually, 'total') ?>, "Annual Sales");
     </script>
-</body>
 </html>

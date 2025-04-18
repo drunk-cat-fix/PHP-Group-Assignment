@@ -1,6 +1,7 @@
 <?php
-require_once 'service/Customer_Complaint.php';
 session_start();
+require_once 'service/Customer_Complaint.php';
+require_once 'nav.php';
 ?>
 
 <!DOCTYPE html>
@@ -18,11 +19,6 @@ session_start();
 <div class="container mt-5">
   <h2>Customer Complaint</h2>
 
-  <?php if ($error): ?>
-    <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
-  <?php elseif ($success): ?>
-    <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
-  <?php endif; ?>
 
   <form class="needs-validation" novalidate action="" method="POST" enctype="multipart/form-data">
     <div class="form-group">
@@ -57,10 +53,10 @@ session_start();
 
     <div class="form-group">
       <label for="complaintAttachment">Supporting File (optional)</label>
-      <input type="file" class="form-control-file" id="complaintAttachment" name="attachment" accept="image/*">
-      <div id="imagePreview" class= "mt-3">
-        <img id="previewImg" src="#" alt="Preview" style="display: none; max-width: 200px; max-height: 200px;" class="img-thumbnail">
-      </div>
+      <div class="custom-file mb-3">
+          <input type="file" class="custom-file-input" id="complaintAttachment" name="attachment" accept="image/*">
+          <label class="custom-file-label" for="complaintAttachment">Choose file</label>
+        </div>
     </div>
 
     <button type="submit" class="btn btn-danger">Submit Complaint</button>
@@ -68,6 +64,10 @@ session_start();
 </div>
 
 <script>
+document.querySelector('.custom-file-input').addEventListener('change', function (e) {
+    var fileName = e.target.files[0]?.name || 'Choose file';
+    e.target.nextElementSibling.innerText = fileName;
+  });
   (function () {
     'use strict';
     window.addEventListener('load', function () {

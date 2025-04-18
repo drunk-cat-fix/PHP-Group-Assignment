@@ -5,9 +5,9 @@ require_once __DIR__ . '\..\dao\AdminDao.php';
 require_once __DIR__ . '\..\Utilities\Connection.php';
 require_once __DIR__ . '\..\entities\Staff.php';
 require_once __DIR__ . '\..\dao\StaffDao.php';
-//set session for admin_id and staff_id
-//if no session, back to login
-//these add later (until very later)
+if ($_SESSION['admin_id'] === NULL || $_SESSION['staff_id'] === NULL) {
+    header("location: login.php");
+}
 
 if ($_POST) {
     $staff = new Staff();

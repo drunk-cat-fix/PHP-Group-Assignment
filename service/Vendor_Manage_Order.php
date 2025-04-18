@@ -13,7 +13,7 @@ $sql = "SELECT op.order_id, GROUP_CONCAT(CONCAT(p.product_name, ' x ', op.qty) S
         JOIN product p ON op.product_id = p.product_id
         JOIN customer_order co ON op.order_id = co.order_id
         WHERE p.product_vendor = :vendor_id AND co.order_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
-        GROUP BY op.order_id, op.status";
+        GROUP BY op.order_id, op.status ORDER BY order_id DESC";
 
 $stmt = $conn->prepare($sql);
 $stmt->bindValue(':vendor_id', $vendor_id, PDO::PARAM_INT);

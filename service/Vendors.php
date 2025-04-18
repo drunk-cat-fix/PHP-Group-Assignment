@@ -5,7 +5,7 @@ $conn = getConnection();
 $query = $_GET['query'] ?? '';
 
 // Base SQL
-$sql = "SELECT vendor_id, shop_name, vendor_desc, vendor_tier, vendor_profile FROM vendor";
+$sql = "SELECT vendor_id, shop_name, shop_city, vendor_desc, vendor_tier, vendor_profile FROM vendor";
 $params = [];
 
 if (!empty($query)) {

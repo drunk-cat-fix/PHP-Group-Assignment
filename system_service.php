@@ -1,7 +1,11 @@
 <?php
 session_start();
 require_once 'service/System_Service.php';
-// Handle search when the form is submitted
+if ($_SESSION['admin_id'] != NULL) {
+require_once 'admin_nav.php';
+} else if ($_SESSION['staff_id'] != NULL) {
+require_once 'staff_nav.php';
+}
 $searchTerm = isset($_GET['search']) ? trim($_GET['search']) : '';
 $filteredServices = array_filter($services, function ($service) use ($searchTerm) {
     return stripos($service['service_name'], $searchTerm) !== false;
@@ -15,31 +19,54 @@ $filteredServices = array_filter($services, function ($service) use ($searchTerm
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Manage Services</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 20px;
         }
         th, td {
             border: 1px solid #ddd;
-            padding: 8px;
+            padding: 12px;
             text-align: left;
-            cursor: pointer;
         }
         th {
             background-color: #f2f2f2;
+            cursor: pointer;
+        }
+        th:hover {
+            background-color: #e6e6e6;
+        }
+        td {
+            padding: 12px;
+            vertical-align: top;
         }
         img {
             width: 50px;
             height: 50px;
             object-fit: cover;
-        }
-        .hidden {
-            display: none;
+            border-radius: 50%;
         }
         #searchBar {
-            margin-bottom: 10px;
             padding: 8px;
             width: 300px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+        }
+        h2 {
+            color: #333;
+        }
+        .placeholder-image {
+            width: 50px;
+            height: 50px;
+            background-color: #ccc;
+            border-radius: 50%;
         }
     </style>
     <script>
@@ -93,7 +120,7 @@ $filteredServices = array_filter($services, function ($service) use ($searchTerm
         <thead>
             <tr>
                 <th onclick="sortTable(0)">Service ID</th>
-                <th onclick="sortTable(1)">Serivce Name</th>
+                <th onclick="sortTable(1)">Service Name</th>
                 <th>Description</th>
                 <th onclick="sortTable(3)">Vendor Name</th>
                 <th onclick="sortTable(4)">Category</th>
@@ -115,9 +142,9 @@ $filteredServices = array_filter($services, function ($service) use ($searchTerm
                         <?php
                         if (!empty($service['service_profile'])) {
                             $imageData = base64_encode($service['service_profile']);
-                            echo '<img src="data:image/jpeg;base64,' . $imageData . '" alt="service Image">';
+                            echo '<img src="data:image/jpeg;base64,' . $imageData . '" alt="Service Image">';
                         } else {
-                            echo '<img src="placeholder.jpg" alt="service Image">';
+                            echo '<div class="placeholder-image"></div>';
                         }
                         ?>
                     </td>

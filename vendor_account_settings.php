@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once 'service/Vendor_Account_Settings.php';
+require_once 'vendor_nav.php';
 ?>
 
 <!DOCTYPE html>
@@ -89,9 +90,11 @@ require_once 'service/Vendor_Account_Settings.php';
         <div class="invalid-feedback">Passwords must match and cannot be empty.</div>
       </div>
 
-      <button type="submit" class="btn btn-primary">Update Account</button>
-      <button type="button" class="btn btn-danger mt-3" onclick="confirmDelete()">Delete Account</button>
-    </form>
+      <div class="form-group d-flex justify-content-start">
+        <button type="submit" class="btn btn-primary mr-2">Update Account</button>
+        <button type="button" class="btn btn-danger" onclick="confirmDelete()">Delete Account</button>
+    </div>
+
   </div>
 
   <script>

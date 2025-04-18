@@ -4,8 +4,6 @@ require_once __DIR__ . '\..\entities\Vendor.php';
 require_once __DIR__ . '\..\dao\VendorDao.php';
 require_once __DIR__ . '\..\Utilities\Connection.php';
 
-$_SESSION['vendor_id'] = 3;
-
 $conn = getConnection();
 
 if ($_POST) {

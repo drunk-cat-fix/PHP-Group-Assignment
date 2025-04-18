@@ -40,4 +40,5 @@ foreach ($incomingResult as $row) {
         'message' => "Order #{$row['order_id']} includes '{$row['product_name']}' (Qty: {$row['qty']})."
     ];
 }
+$notificationCount = count($notifications);
 ?>

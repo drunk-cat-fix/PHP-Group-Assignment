@@ -1,7 +1,7 @@
 ﻿<?php
 session_start();
 require_once __DIR__ . '/service/Admin_Manage_Staff.php';
-//require_once __DIR__ . '/Utilities/Upload.php';
+require_once 'admin_nav.php';
 if ($_POST) {
     $staff_name = $_POST['staff_name'];
     $staff_email = $_POST['staff_email'];
@@ -32,164 +32,210 @@ if ($_POST) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Manage Staff</title>
     <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 10px 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
         th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
             text-align: left;
         }
 
         th {
-            background-color: #f2f2f2;
+            background-color: #f8f9fa;
+            font-weight: bold;
         }
 
-        .task-section {
-            margin-top: 20px;
-            padding: 15px;
-            border: 1px solid #ddd;
-            background-color: #f9f9f9;
+        tr:hover {
+            background-color: #f1f1f1;
         }
 
         /* Modal styles */
         .modal {
             display: none;
             position: fixed;
-            z-index: 1;
+            z-index: 10;
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
             overflow: auto;
-            background-color: rgb(0, 0, 0);
-            background-color: rgba(0, 0, 0, 0.4);
-            padding-top: 60px;
+            background-color: rgba(0, 0, 0, 0.5);
         }
 
         .modal-content {
-            background-color: #fefefe;
+            background-color: #fff;
             margin: 5% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
+            padding: 30px;
+            border-radius: 8px;
+            width: 500px;
+            max-width: 90%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
         }
 
         .close {
-            color: #aaa;
-            float: right;
+            position: absolute;
+            top: 10px;
+            right: 20px;
             font-size: 28px;
             font-weight: bold;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
+            color: #aaa;
             cursor: pointer;
         }
 
-        input[type="text"], input[type="email"], input[type="file"], input[type=password] {
+        .close:hover {
+            color: black;
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+        }
+
+        .modal-content form label {
+            display: block;
+            margin: 12px 0 6px;
+        }
+
+        .modal-content form input {
             width: 100%;
             padding: 8px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
 
-        button {
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
+        .modal-content form button {
+            margin-top: 15px;
+            background-color: #28a745;
         }
 
-        button:hover {
-            background-color: #45a049;
-        }
-        .task-section h3 {
-            margin-bottom: 10px;
-            color: #333;
-        }
-        .task-section table {
-            background-color: #fff;
+        .modal-content form button:hover {
+            background-color: #218838;
         }
     </style>
 </head>
 <body>
-<h2>Admin Manage Staff</h2>
+    <h2>Admin - Manage Staff</h2>
 
-<!-- Add Staff Button -->
-<button id="addStaffBtn">Add Staff</button>
+    <!-- Add Staff Button -->
+    <button id="addStaffBtn">➕ Add Staff</button>
 
-<!-- Modal for adding staff -->
-<div id="staffModal" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <h3>Add New Staff</h3>
-        <form action="admin_manage_staff.php" method="POST" enctype="multipart/form-data">
-            <label for="staff_name">Staff Name:</label>
-            <input type="text" id="staff_name" name="staff_name" required><br>
+    <!-- Modal for adding staff -->
+    <div id="staffModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Add New Staff</h3>
+            <form action="admin_manage_staff.php" method="POST" enctype="multipart/form-data">
+                <label for="staff_name">Staff Name</label>
+                <input type="text" id="staff_name" name="staff_name" required>
 
-            <label for="password">Password: </label>
-            <input id="password" type="password" name="password" required><br>
+                <label for="staff_email">Email</label>
+                <input type="email" id="staff_email" name="staff_email" required>
 
-            <label for="staff_address">Address:</label>
-            <input type="text" id="staff_address" name="staff_address" required><br>
+                <label for="password">Password</label>
+                <input type="password" id="password" name="staff_password" required>
 
-            <label for="staff_email">Email:</label>
-            <input type="email" id="staff_email" name="staff_email" required><br>
+                <label for="staff_address">Address</label>
+                <input type="text" id="staff_address" name="staff_address" required>
 
-            <label for="staff_profile">Profile Picture:</label>
-            <input type="file" id="staff_profile" name="avatar"><br>
+                <label for="avatar">Profile Picture</label>
+                <input type="file" id="avatar" name="avatar" accept="image/*" required>
 
-            <button type="submit">Add Staff</button>
-        </form>
+                <button type="submit">Add Staff</button>
+            </form>
+        </div>
     </div>
-</div>
 
-<!-- Staff Table -->
-<table>
-    <thead>
-    <tr>
-        <th>Staff ID</th>
-        <th>Staff Name</th>
-        <th>Address</th>
-        <th>Email</th>
-        <th>Tasks Assigned</th>
-        <th>Tasks Completed</th>
-        <th>Overdue Tasks</th>
-        <th>Completion Rate</th>
-    </tr>
-    </thead>
-    <tbody>
-    <?php if (!empty($staffList)): ?>
-        <?php foreach ($staffList as $staff): ?>
-            <tr>
-                <td><?= htmlspecialchars($staff['staff_id']) ?></td>
-                <td>
-                    <a href="admin_staff_details.php?id=<?= htmlspecialchars($staff['staff_id']) ?>">
-                        <?= htmlspecialchars($staff['staff_name']) ?>
-                    </a>
-                </td>
-                <td><?= htmlspecialchars($staff['staff_address']) ?></td>
-                <td><?= htmlspecialchars($staff['staff_email']) ?></td>
-                <td><?= $staff['tasks_assigned'] ?></td>
-                <td><?= $staff['tasks_completed'] ?></td>
-                <td><?= $staff['overdue_tasks'] ?></td>
-                <td><?= $staff['completion_rate'] ?>%</td>
-            </tr>
-        <?php endforeach; ?>
-    <?php else: ?>
+    <!-- Staff Table -->
+    <table>
+        <thead>
         <tr>
-            <td colspan="8">No staff found.</td>
+            <th>Staff ID</th>
+            <th>Name</th>
+            <th>Address</th>
+            <th>Email</th>
+            <th>Assigned</th>
+            <th>Completed</th>
+            <th>Overdue</th>
+            <th>Rate</th>
         </tr>
-    <?php endif; ?>
-    </tbody>
+        </thead>
+        <tbody>
+        <?php if (!empty($staffList)): ?>
+            <?php foreach ($staffList as $staff): ?>
+                <tr>
+                    <td><?= htmlspecialchars($staff['staff_id']) ?></td>
+                    <td>
+                        <a href="admin_staff_details.php?id=<?= htmlspecialchars($staff['staff_id']) ?>">
+                            <?= htmlspecialchars($staff['staff_name']) ?>
+                        </a>
+                    </td>
+                    <td><?= htmlspecialchars($staff['staff_address']) ?></td>
+                    <td><?= htmlspecialchars($staff['staff_email']) ?></td>
+                    <td><?= $staff['tasks_assigned'] ?></td>
+                    <td><?= $staff['tasks_completed'] ?></td>
+                    <td><?= $staff['overdue_tasks'] ?></td>
+                    <td><?= $staff['completion_rate'] ?>%</td>
+                </tr>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <tr>
+                <td colspan="8">No staff found.</td>
+            </tr>
+        <?php endif; ?>
+        </tbody>
+    </table>
 
-</table>
+    <script>
+        var modal = document.getElementById("staffModal");
+        var btn = document.getElementById("addStaffBtn");
+        var span = document.getElementsByClassName("close")[0];
+
+        btn.onclick = function () {
+            modal.style.display = "block";
+        }
+
+        span.onclick = function () {
+            modal.style.display = "none";
+        }
+
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+</body>
 
 <script>
     // Modal functionality
@@ -214,5 +260,4 @@ if ($_POST) {
         }
     }
 </script>
-</body>
 </html>
