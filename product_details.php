@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once 'service/Product_Details.php';
 ?>
@@ -71,7 +71,9 @@ require_once 'service/Product_Details.php';
     <?php else: ?>
         <p class="price">Price: RM <?= number_format($product['product_price'], 2) ?></p>
     <?php endif; ?>
-    <p><strong>Vendor:</strong> <?= htmlspecialchars($product['vendor_name']) ?></p>
+    <a href="shop.php?vendor_id=<?= $product['product_vendor'] ?>"
+        <p><strong>Vendor:</strong> <?= htmlspecialchars($product['vendor_name']) ?></p>
+    </a>
     <p><strong>Rating:</strong> <?= $avg_rating ?></p>
 
     <!-- Form for selecting quantity and adding to cart -->
@@ -87,10 +89,37 @@ require_once 'service/Product_Details.php';
         <?php endif; ?>
     </form>
 
+    <div style="margin-top: 20px;">
+        <a href="product_rating.php?id=<?= $product_id ?>" style="padding: 10px 20px; background-color: #FF9800; color: white; text-decoration: none; border-radius: 5px;">Write a Review</a>
+        <a href="shop.php?id=<?= htmlspecialchars($product['vendor_id']) ?>" style="padding: 10px 20px; background-color: #3F51B5; color: white; text-decoration: none; border-radius: 5px; margin-left: 10px;">Visit Shop</a>
+    </div>
+
     <!-- Display message if product is added to cart -->
     <?php if (isset($_SESSION['message'])): ?>
         <p style="color: green;"><?= $_SESSION['message'] ?></p>
         <?php unset($_SESSION['message']); ?>
+    <?php endif; ?>
+
+    <?php if (!empty($reviews)): ?>
+        <div style="margin-top: 40px;">
+            <h3>Customer Reviews</h3>
+            <?php foreach ($reviews as $review): ?>
+                <div style="border-top: 1px solid #ccc; padding: 10px 0;">
+                    <strong><?= htmlspecialchars($review['customer_name']) ?></strong>
+                    <div style="color: #FFD700;">
+                        <?php for ($i = 0; $i < 5; $i++): ?>
+                            <?= $i < $review['product_rating'] ? '★' : '☆' ?>
+                        <?php endfor; ?>
+                    </div>
+                    <p><?= nl2br(htmlspecialchars($review['product_review'])) ?></p>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    <?php else: ?>
+        <div style="margin-top: 40px;">
+            <h3>Customer Reviews</h3>
+            <p>No reviews yet.</p>
+        </div>
     <?php endif; ?>
 </div>
 

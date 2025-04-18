@@ -44,7 +44,15 @@ require_once 'service/Staff_Dashboard.php';
                 let taskIds = [];
                 let progressUpdates = [];
 
-                // Get task status updates
+                // Get task status updates from span elements with "Done" status
+                document.querySelectorAll(".complete-date-display").forEach(span => {
+                    if (span.dataset.status === "Done" || span.textContent === "Done") {
+                        let taskId = span.id.replace("complete-date-", "");
+                        taskIds.push(parseInt(taskId));
+                    }
+                });
+        
+                // Also check any remaining select elements (for tasks without progress)
                 document.querySelectorAll(".complete-date-select").forEach(select => {
                     if (select.value === "Done") {
                         let taskId = select.closest("tr").querySelector("td:first-child").innerText;
@@ -65,7 +73,7 @@ require_once 'service/Staff_Dashboard.php';
                     }
                 });
 
-                // Decide which updates to send
+                // Same save logic as before
                 if (taskIds.length > 0 && progressUpdates.length > 0) {
                     // Send both updates in sequence
                     sendTaskUpdates(taskIds)
@@ -155,36 +163,22 @@ require_once 'service/Staff_Dashboard.php';
         function updateProgressValue(inputElement) {
             document.getElementById("save-cancel-container").classList.remove("hidden");
     
-            // Get the task row
+            // Get the task row and task ID
             const row = inputElement.closest("tr");
-            const selectElement = row.querySelector(".complete-date-select");
-            const doneOption = selectElement ? selectElement.querySelector("option[value='Done']") : null;
+            const taskId = row.querySelector("td:first-child").innerText;
             const progressValue = parseInt(inputElement.value);
     
-            // If progress is 100%, enable the select and the Done option, otherwise disable them
-            if (selectElement) {
+            // Find the complete date display element
+            const completeDateDisplay = document.getElementById(`complete-date-${taskId}`);
+    
+            // If progress is 100%, set the complete date to "Done", otherwise "Incomplete"
+            if (completeDateDisplay) {
                 if (progressValue >= 100) {
-                    selectElement.disabled = false;
-                    if (doneOption) doneOption.disabled = false;
-            
-                    // Remove the warning message if it exists
-                    const warningMsg = row.querySelector("small");
-                    if (warningMsg) warningMsg.style.display = "none";
+                    completeDateDisplay.textContent = "Done";
+                    completeDateDisplay.dataset.status = "Done";
                 } else {
-                    selectElement.disabled = true;
-                    if (doneOption) doneOption.disabled = true;
-            
-                    // Add or show the warning message
-                    let warningMsg = row.querySelector("small");
-                    if (!warningMsg) {
-                        warningMsg = document.createElement("small");
-                        warningMsg.style.color = "red";
-                        warningMsg.style.display = "block";
-                        warningMsg.textContent = "Requires 100% progress";
-                        selectElement.parentNode.appendChild(warningMsg);
-                    } else {
-                        warningMsg.style.display = "block";
-                    }
+                    completeDateDisplay.textContent = "Incomplete";
+                    completeDateDisplay.dataset.status = "Incomplete";
                 }
             }
         }
@@ -229,12 +223,15 @@ require_once 'service/Staff_Dashboard.php';
                         <?php if (!empty($task['task_done_date'])): ?>
                             <?php echo htmlspecialchars($task['task_done_date']); ?>
                         <?php else: ?>
-                            <select class="complete-date-select" onchange="updateCompleteDate(this)" <?php echo (!empty($task['order_id']) && (!isset($task['deliver_percent']) || $task['deliver_percent'] < 100)) ? 'disabled' : ''; ?>>
-                                <option value="Incomplete" selected>Incomplete</option>
-                                <option value="Done" <?php echo (!empty($task['order_id']) && (!isset($task['deliver_percent']) || $task['deliver_percent'] < 100)) ? 'disabled' : ''; ?>>Done</option>
-                            </select>
-                            <?php if (!empty($task['order_id']) && (!isset($task['deliver_percent']) || $task['deliver_percent'] < 100)): ?>
-                                <small style="color: red; display: block;">Requires 100% progress</small>
+                            <?php if (!empty($task['order_id']) && isset($task['deliver_percent'])): ?>
+                                <span class="complete-date-display" id="complete-date-<?php echo $task['task_id']; ?>">
+                                    <?php echo ($task['deliver_percent'] >= 100) ? 'Done' : 'Incomplete'; ?>
+                                </span>
+                            <?php else: ?>
+                                <select class="complete-date-select" onchange="updateCompleteDate(this)">
+                                    <option value="Incomplete" selected>Incomplete</option>
+                                    <option value="Done">Done</option>
+                                </select>
                             <?php endif; ?>
                         <?php endif; ?>
                     </td>

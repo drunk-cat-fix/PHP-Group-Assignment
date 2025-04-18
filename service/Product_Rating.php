@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $stmt = $conn->prepare("INSERT INTO product_review (product_id, customer_id, product_review, product_rating) VALUES (?, ?, ?, ?)");
         $stmt->execute([$product_id, $customer_id, $review, $rating]);
-        header("Location: product.php?id=" . $product_id); // or wherever you want to redirect
+        header("Location: product_details.php?product_id=" . $product_id); // or wherever you want to redirect
         exit();
     }
 }

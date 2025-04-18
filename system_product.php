@@ -102,7 +102,6 @@ $filteredProducts = array_filter($products, function ($product) use ($searchTerm
                 <th onclick="sortTable(6)">Packaging</th>
                 <th onclick="sortTable(7)">Price</th>
                 <th onclick="sortTable(8)">Rating</th>
-                <th>Profile</th>
                 <th onclick="sortTable(9)">Visit Count</th>
             </tr>
         </thead>
@@ -118,14 +117,15 @@ $filteredProducts = array_filter($products, function ($product) use ($searchTerm
                     <td><?php echo $product['product_qty']; ?></td>
                     <td><?php echo htmlspecialchars($product['product_packaging']); ?></td>
                     <td>$<?php echo number_format($product['product_price'], 2); ?></td>
-                    <td><?php echo $product['product_rating']; ?></td>
                     <td>
                         <?php
-                        if (!empty($product['product_profile'])) {
-                            $imageData = base64_encode($product['product_profile']);
-                            echo '<img src="data:image/jpeg;base64,' . $imageData . '" alt="Product Image">';
-                        } else {
-                            echo '<img src="placeholder.jpg" alt="Product Image">';
+                        $rating = isset($product['avg_rating']) ? round($product['avg_rating']) : 0;
+                        for ($i = 1; $i <= 5; $i++) {
+                            if ($i <= $rating) {
+                                echo '<span style="color: gold;">&#9733;</span>'; // Filled star
+                            } else {
+                                echo '<span style="color: #ccc;">&#9734;</span>'; // Empty star
+                            }
                         }
                         ?>
                     </td>
