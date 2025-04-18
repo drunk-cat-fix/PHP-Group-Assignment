@@ -14,12 +14,11 @@ $visit_stmt->bindParam(':vendor_id', $vendor_id, PDO::PARAM_INT);
 $visit_stmt->execute();
 
 // Increment shop_search_count if shop was accessed from search
-if (isset($_GET['from_search']) && $_GET['from_search'] == 1 && isset($_SESSION['searched_ids'])) {
-    if (in_array($vendor_id, $_SESSION['searched_ids'])) {
-        $search_sql = "UPDATE vendor SET shop_search_count = shop_search_count + 1 WHERE vendor_id = :vendor_id";
-        $search_stmt = $conn->prepare($search_sql);
-        $search_stmt->bindParam(':vendor_id', $vendor_id, PDO::PARAM_INT);
-        $search_stmt->execute();
+if (isset($_GET['id'], $_GET['from_search']) && $_GET['from_search'] == '1') {
+    $vendorId = $_GET['id'];
+    if (isset($_SESSION['searched_vendor_ids']) && in_array($vendorId, $_SESSION['searched_vendor_ids'])) {
+        $stmt = $conn->prepare("UPDATE vendor SET shop_search_count = shop_search_count + 1 WHERE vendor_id = :id");
+        $stmt->execute([':id' => $vendorId]);
     }
 }
 

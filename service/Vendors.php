@@ -9,7 +9,7 @@ $sql = "SELECT vendor_id, shop_name, vendor_desc, vendor_tier, vendor_profile FR
 $params = [];
 
 if (!empty($query)) {
-    $sql .= " WHERE vendor_name LIKE :query";
+    $sql .= " WHERE shop_name LIKE :query";
     $params[':query'] = '%' . $query . '%';
 }
 
@@ -24,4 +24,6 @@ $sql .= " ORDER BY
 $stmt = $conn->prepare($sql);
 $stmt->execute($params);
 $vendors = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+$_SESSION['searched_vendor_ids'] = array_column($vendors, 'vendor_id');
 ?>

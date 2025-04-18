@@ -19,6 +19,7 @@ class Admin
     private $task_due_date;
     private $assigned_staff;
     private $staff_id;
+    private $order_id; // Added order_id property
 
     /**
      * @return mixed
@@ -218,5 +219,14 @@ class Admin
         return $this->staff_id;
     }
 
+    // New methods for order_id
+    public function setOrderID($order_id)
+    {
+        $this->order_id = $order_id;
+    }
 
+    public function getOrderID()
+    {
+        return $this->order_id;
+    }
 }

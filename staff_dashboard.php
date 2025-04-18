@@ -37,28 +37,31 @@ require_once 'service/Staff_Dashboard.php';
         
         function updateProgressValue(inputElement) {
             document.getElementById("save-cancel-container").classList.remove("hidden");
+
+            // Get the task row and task ID
+            const row = inputElement.closest("tr");
+            const taskId = row.querySelector("td:first-child").innerText;
+            const progressValue = parseInt(inputElement.value);
+
+            // Find the complete date display element
+            const completeDateDisplay = document.getElementById(`complete-date-${taskId}`);
+
+            // If progress is 100%, set the complete date to "Done", otherwise "Incomplete"
+            if (completeDateDisplay) {
+                if (progressValue >= 100) {
+                    completeDateDisplay.textContent = "Done";
+                    completeDateDisplay.dataset.status = "Done";
+                } else {
+                    completeDateDisplay.textContent = "Incomplete";
+                    completeDateDisplay.dataset.status = "Incomplete";
+                }
+            }
         }
         
         function confirmSave() {
             if (confirm("Are you sure you want to save changes?")) {
-                let taskIds = [];
                 let progressUpdates = [];
-
-                // Get task status updates from span elements with "Done" status
-                document.querySelectorAll(".complete-date-display").forEach(span => {
-                    if (span.dataset.status === "Done" || span.textContent === "Done") {
-                        let taskId = span.id.replace("complete-date-", "");
-                        taskIds.push(parseInt(taskId));
-                    }
-                });
-        
-                // Also check any remaining select elements (for tasks without progress)
-                document.querySelectorAll(".complete-date-select").forEach(select => {
-                    if (select.value === "Done") {
-                        let taskId = select.closest("tr").querySelector("td:first-child").innerText;
-                        taskIds.push(parseInt(taskId));
-                    }
-                });
+                let progressTaskIds = [];
 
                 // Get progress updates
                 document.querySelectorAll(".progress-input").forEach(input => {
@@ -73,75 +76,53 @@ require_once 'service/Staff_Dashboard.php';
                     }
                 });
 
-                // Same save logic as before
-                if (taskIds.length > 0 && progressUpdates.length > 0) {
-                    // Send both updates in sequence
-                    sendTaskUpdates(taskIds)
-                        .then(result => {
-                            if (result.success) {
-                                return sendProgressUpdates(progressUpdates);
-                            } else {
-                                throw new Error("Failed to update tasks");
-                            }
-                        })
-                        .then(result => {
-                            if (result.success) {
+                // Get task completions from select elements (for tasks without progress)
+                let taskIds = [];
+                document.querySelectorAll(".complete-date-select").forEach(select => {
+                    if (select.value === "Done") {
+                        let taskId = select.closest("tr").querySelector("td:first-child").innerText;
+                        taskIds.push(parseInt(taskId));
+                    }
+                });
+
+                // Create a promise to track all updates
+                let allPromises = [];
+        
+                // Add progress updates promise if needed
+                if (progressUpdates.length > 0) {
+                    allPromises.push(sendProgressUpdates(progressUpdates));
+                }
+        
+                // Add task updates promise if needed
+                if (taskIds.length > 0) {
+                    allPromises.push(sendTaskUpdates(taskIds));
+                }
+        
+                if (allPromises.length > 0) {
+                    Promise.all(allPromises)
+                        .then(results => {
+                            // Check if all results were successful
+                            const allSuccessful = results.every(result => result.success);
+                    
+                            if (allSuccessful) {
                                 alert("✅ All changes saved successfully!");
-                                location.reload();
                             } else {
-                                alert("❌ Failed to update progress values.");
+                                // If any update failed, alert the user
+                                alert("❌ Some updates couldn't be completed. Please check the data and try again.");
                             }
+                    
+                            // Reload the page regardless
+                            location.reload();
                         })
                         .catch(error => {
                             console.error("Error:", error);
-                            alert("❌ " + error.message);
-                        });
-                } else if (taskIds.length > 0) {
-                    // Send only task updates
-                    sendTaskUpdates(taskIds)
-                        .then(result => {
-                            if (result.success) {
-                                alert("✅ Task status updated successfully!");
-                                location.reload();
-                            } else {
-                                alert("❌ Failed to update tasks.");
-                            }
-                        })
-                        .catch(error => {
-                            console.error("Error:", error);
-                            alert("❌ Error updating tasks.");
-                        });
-                } else if (progressUpdates.length > 0) {
-                    // Send only progress updates
-                    sendProgressUpdates(progressUpdates)
-                        .then(result => {
-                            if (result.success) {
-                                alert("✅ Progress values updated successfully!");
-                                location.reload();
-                            } else {
-                                alert("❌ Failed to update progress values.");
-                            }
-                        })
-                        .catch(error => {
-                            console.error("Error:", error);
-                            alert("❌ Error updating progress values.");
+                            alert("❌ An error occurred while saving changes");
+                            location.reload();
                         });
                 } else {
                     alert("No changes detected to save.");
                 }
             }
-        }
-
-        function sendTaskUpdates(taskIds) {
-            return fetch("service/Staff_Dashboard.php", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ 
-                    action: "updateTaskStatus",
-                    taskIds: taskIds
-                })
-            })
-            .then(response => response.json());
         }
 
         function sendProgressUpdates(progressUpdates) {
@@ -181,6 +162,17 @@ require_once 'service/Staff_Dashboard.php';
                     completeDateDisplay.dataset.status = "Incomplete";
                 }
             }
+        }
+        function sendTaskUpdates(taskIds) {
+            return fetch("service/Staff_Dashboard.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    action: "updateTaskStatus",
+                    taskIds: taskIds
+                })
+            })
+            .then(response => response.json());
         }
     </script>
 </head>
@@ -224,7 +216,9 @@ require_once 'service/Staff_Dashboard.php';
                             <?php echo htmlspecialchars($task['task_done_date']); ?>
                         <?php else: ?>
                             <?php if (!empty($task['order_id']) && isset($task['deliver_percent'])): ?>
-                                <span class="complete-date-display" id="complete-date-<?php echo $task['task_id']; ?>">
+                                <span class="complete-date-display" 
+                                      id="complete-date-<?php echo $task['task_id']; ?>"
+                                      data-status="<?php echo ($task['deliver_percent'] >= 100) ? 'Done' : 'Incomplete'; ?>">
                                     <?php echo ($task['deliver_percent'] >= 100) ? 'Done' : 'Incomplete'; ?>
                                 </span>
                             <?php else: ?>

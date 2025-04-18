@@ -164,7 +164,7 @@ function updateTaskStatus($taskIds) {
             $stmt->execute([$today, $taskId]);
             if ($result['order_id']) {
                 // Update deliver_date and deliver_status in customer_order table
-                $sql = "UPDATE customer_order SET deliver_date = ?, deliver_status = 'Arrived' WHERE order_id = ?";
+                $sql = "UPDATE customer_order SET deliver_date = ?, deliver_status = 'Delivered', isInProgress = FALSE, isDelivered = TRUE, isRead = FALSE WHERE order_id = ?";
                 $stmt = $conn->prepare($sql);
                 $stmt->execute([$today, $result['order_id']]);
             }
@@ -187,15 +187,49 @@ function updateDeliveryProgress($progressUpdates) {
     $conn = getConnection();
     $conn->beginTransaction();
     try {
+        $today = date('Y-m-d');
+        
         foreach ($progressUpdates as $update) {
-            $sql = "UPDATE customer_order SET deliver_percent = ?, isInProgress = FALSE, isDelivered = TRUE WHERE order_id = ?";
-            $stmt = $conn->prepare($sql);
-            $stmt->execute([$update['progress'], $update['order_id']]);
+            $orderId = $update['order_id'];
+            $progress = $update['progress'];
+            
+            if ($progress >= 100) {
+                // If progress is 100%, update order as delivered
+                $sql = "UPDATE customer_order SET 
+                        deliver_percent = ?, 
+                        deliver_date = ?,
+                        deliver_status = 'Delivered',
+                        isInProgress = FALSE, 
+                        isDelivered = TRUE,
+                        isRead = FALSE
+                        WHERE order_id = ?";
+                        
+                $stmt = $conn->prepare($sql);
+                $stmt->execute([$progress, $today, $orderId]);
+                
+                // Also mark the associated task as complete
+                $taskSql = "UPDATE task SET task_done_date = ? 
+                           WHERE order_id = ? AND task_done_date IS NULL";
+                $taskStmt = $conn->prepare($taskSql);
+                $taskStmt->execute([$today, $orderId]);
+            } else {
+                // For non-100% progress, just update the progress value
+                $sql = "UPDATE customer_order SET 
+                        deliver_percent = ?,
+                        isInProgress = TRUE,
+                        isDelivered = FALSE
+                        WHERE order_id = ?";
+                        
+                $stmt = $conn->prepare($sql);
+                $stmt->execute([$progress, $orderId]);
+            }
         }
+        
         $conn->commit();
         return true;
     } catch (Exception $e) {
         $conn->rollBack();
+        error_log("Error in updateDeliveryProgress: " . $e->getMessage());
         return false;
     }
 }

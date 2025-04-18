@@ -15,7 +15,7 @@ function processOrder($customer_id, $grand_total, $items) {
         $conn->beginTransaction();
 
         // 1. Insert into customer_order
-        $stmt = $conn->prepare("INSERT INTO customer_order (customer_id, order_date, order_time, amount, isPending) VALUES (?, CURDATE(), CURTIME(), ?, TRUE)");
+        $stmt = $conn->prepare("INSERT INTO customer_order (customer_id, order_date, order_time, amount, deliver_status, isPending, isRead) VALUES (?, CURDATE(), CURTIME(), ?, 'Pending', TRUE, FALSE)");
         $stmt->execute([$customer_id, $grand_total]);
 
         $order_id = $conn->lastInsertId(); // Get the order_id from the inserted record

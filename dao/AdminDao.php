@@ -129,46 +129,79 @@ class AdminDao
 
     public function addTask(Admin $admin)
     {
+        // Use our debug log function if it exists
+        if (function_exists('debug_log')) {
+            debug_log("AdminDao::addTask method started");
+        } else {
+            error_log("AdminDao::addTask method started");
+        }
+
         $conn = getConnection();  
         $taskName = $admin->getTaskName();
         $taskDesc = $admin->getTaskDesc();
         $taskStartDate = $admin->getTaskStartDate();
         $taskDueDate = $admin->getTaskDueDate();
+        $assignedStaffs = $admin->getAssignedStaff();
+        $orderID = $admin->getOrderID(); // Get the order_id directly
 
-        $orderID = null;
-        if (preg_match('/#(\d+)/', $taskName, $matches)) {
-            $orderID = $matches[1];
+        // Log task details
+        debug_log("Task details - Name: $taskName, Start: $taskStartDate, Due: $taskDueDate");
+        if ($orderID) {
+            debug_log("Task is associated with order ID: $orderID");
+        }
+        debug_log("Staff assignment count: " . count($assignedStaffs));
+
+        if (is_array($assignedStaffs)) {
+            debug_log("Staff IDs for assignment: " . implode(', ', $assignedStaffs));
+        } else {
+            debug_log("ERROR: assignedStaffs is not an array!");
         }
 
         try {
+            debug_log("Starting transaction");
             $conn->beginTransaction();
 
+            // Create the task with or without order_id
             if ($orderID) {
                 $sql = "INSERT INTO task (task_name, task_desc, task_start_date, task_due_date, order_id) 
                         VALUES (?, ?, ?, ?, ?)";
                 $stmt = $conn->prepare($sql);
                 $stmt->execute([$taskName, $taskDesc, $taskStartDate, $taskDueDate, $orderID]);
+                debug_log("Task inserted with order_id=$orderID");
+            
+                // Update order status
                 $this->changeDeliverStatus($orderID, $conn);
+                debug_log("Order delivery status updated for order ID: $orderID");
             } else {
                 $sql = "INSERT INTO task (task_name, task_desc, task_start_date, task_due_date) 
                         VALUES (?, ?, ?, ?)";
                 $stmt = $conn->prepare($sql);
                 $stmt->execute([$taskName, $taskDesc, $taskStartDate, $taskDueDate]);
+                debug_log("Task inserted without order_id");
             }
 
             $taskID = $conn->lastInsertId();
-            $assignedStaffs = $admin->getAssignedStaff();
-
-            // Always commit if the task creation was successful
+            debug_log("Generated task ID: $taskID");
+    
+            // Commit the task creation
             $conn->commit();
-
-            // Directly return the result of assignTask using $this
-            return $this->assignTask($taskID, $assignedStaffs); // Use $this instead of calling assignTask() globally
+            debug_log("Transaction committed for task creation");
+    
+            // Now handle staff assignment
+            if (!empty($assignedStaffs)) {
+                debug_log("Attempting to assign " . count($assignedStaffs) . " staff member(s) to task");
+                $staffAssignResult = $this->assignTask($taskID, $assignedStaffs);
+                debug_log("Staff assignment result: " . ($staffAssignResult ? "SUCCESS" : "FAILED"));
+                return $staffAssignResult;
+            } else {
+                debug_log("No staff to assign, task created successfully without staff");
+                return true;
+            }
 
         } catch (Exception $e) {
-            // Log the error for debugging
-            error_log("Error adding task: " . $e->getMessage());
+            debug_log("ERROR in addTask: " . $e->getMessage());
             $conn->rollBack();
+            debug_log("Transaction rolled back");
             return false;
         }
     }
@@ -216,26 +249,71 @@ class AdminDao
 
     public function assignTask($taskID, $assignedStaffs)
     {
-        if (!$taskID || empty($assignedStaffs)) {
+        if (function_exists('debug_log')) {
+            debug_log("assignTask method called with taskID=$taskID");
+        } else {
+            error_log("assignTask method called with taskID=$taskID");
+        }
+    
+        if (!$taskID) {
+            debug_log("Invalid taskID (empty/null)");
             return false;
         }
+    
+        if (empty($assignedStaffs)) {
+            debug_log("No staff IDs provided for assignment");
+            return false;
+        }
+    
+        if (!is_array($assignedStaffs)) {
+            debug_log("ERROR: assignedStaffs is not an array type: " . gettype($assignedStaffs));
+            return false;
+        }
+    
+        debug_log("Staff IDs to assign: " . implode(", ", $assignedStaffs));
 
         try {
             $conn = getConnection();
+            debug_log("Starting transaction for staff assignment");
             $conn->beginTransaction();
+        
             $sql = "INSERT INTO staff_task (staff_id, task_id) VALUES (?, ?)";
             $stmt = $conn->prepare($sql);
-
+        
+            $successCount = 0;
             foreach ($assignedStaffs as $staffId) {
-                $stmt->execute([$staffId, $taskID]);
+                debug_log("Attempting to assign staff ID $staffId to task ID $taskID");
+            
+                try {
+                    $result = $stmt->execute([$staffId, $taskID]);
+                    if ($result) {
+                        debug_log("Successfully assigned staff ID $staffId");
+                        $successCount++;
+                    } else {
+                        debug_log("Failed to execute statement for staff ID $staffId");
+                        // Get database error info
+                        $errorInfo = $stmt->errorInfo();
+                        debug_log("SQL Error: " . implode(" | ", $errorInfo));
+                    }
+                } catch (PDOException $e) {
+                    debug_log("PDO Exception assigning staff: " . $e->getMessage());
+                }
             }
 
-            $conn->commit();
-            return true;
+            if ($successCount > 0) {
+                debug_log("Successfully assigned $successCount staff members, committing transaction");
+                $conn->commit();
+                return true;
+            } else {
+                debug_log("No staff assignments succeeded, rolling back");
+                $conn->rollBack();
+                return false;
+            }
         } catch (Exception $e) {
-            error_log("Error assigning task: " . $e->getMessage());
+            debug_log("ERROR in assignTask: " . $e->getMessage());
             if (isset($conn)) {
                 $conn->rollBack();
+                debug_log("Transaction rolled back");
             }
             return false;
         }
@@ -247,7 +325,7 @@ class AdminDao
             $conn = getConnection();
         }
     
-        $sql = "UPDATE customer_order SET deliver_status = 'In Progress', isPending = FALSE, isInProgress = TRUE WHERE order_id = ?";
+        $sql = "UPDATE customer_order SET deliver_status = 'In Progress', isPending = FALSE, isInProgress = TRUE, isRead = FALSE WHERE order_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->execute([$orderID]);
     }

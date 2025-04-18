@@ -45,6 +45,21 @@ require_once 'service/Admin_Add_Task.php';
 <body>    
     <div class="task-section">
         <h3>Add Task</h3>
+        <!-- Debug Messages -->
+        <?php if (!empty($_SESSION['debug_log'])): ?>
+            <div style="margin: 20px; padding: 15px; border: 1px solid #ccc; background: #f9f9f9;">
+                <h3>Debug Information:</h3>
+                <ol>
+                    <?php foreach ($_SESSION['debug_log'] as $message): ?>
+                        <li><?php echo htmlspecialchars($message); ?></li>
+                    <?php endforeach; ?>
+                </ol>
+            </div>
+            <?php 
+            // Clear debug log after displaying
+            $_SESSION['debug_log'] = [];
+            ?>
+        <?php endif; ?>
         <form id="addTaskForm" action="service/Admin_Add_Task.php" method="POST">
             <label for="task_name">Task Name</label>
             <input type="text" id="task_name" name="task_name" value="<?php echo htmlspecialchars($taskName); ?>" required><br>
@@ -66,9 +81,19 @@ require_once 'service/Admin_Add_Task.php';
             <p id="selectedStaffText" style="display: none;"><strong>Selected Staffs:</strong></p>
             <div id="selectedStaffContainer"></div>
             <div id="hiddenInputsContainer"></div>
+            
+            <?php if(isset($orderId)): ?>
+            <input type="hidden" name="order_id" value="<?php echo $orderId; ?>">
+            <?php endif; ?>
+            
             <button type="submit">Add Task</button>
         </form>
     </div>
+    <?php if (isset($_GET['errMsg'])): ?>
+        <div style="color: red; padding: 10px; margin: 10px 0; background-color: #ffeeee; border: 1px solid #ffcccc;">
+            Error: <?php echo htmlspecialchars($_GET['errMsg']); ?>
+        </div>
+    <?php endif; ?>
     <script>
     document.addEventListener("DOMContentLoaded", function () {
         const assignedStaffSelect = document.getElementById("assigned_staff");
@@ -83,7 +108,6 @@ require_once 'service/Admin_Add_Task.php';
         });
     
         addStaffBtn.addEventListener("click", function () {
-            console.log("Add staff clicked"); // for debugging
             const selectedValue = assignedStaffSelect.value;
             const selectedText = assignedStaffSelect.options[assignedStaffSelect.selectedIndex].text;
         
@@ -104,17 +128,12 @@ require_once 'service/Admin_Add_Task.php';
             staffItem.textContent = text;
             staffItem.classList.add("selected-staff");
             staffItem.dataset.value = value;
-            staffItem.style.margin = "5px";
-            staffItem.style.padding = "3px 8px";
-            staffItem.style.backgroundColor = "#f0f0f0";
-            staffItem.style.borderRadius = "3px";
-            staffItem.style.cursor = "pointer";
         
             staffItem.addEventListener("click", function () {
                 delete selectedStaffs[value];
                 staffItem.remove();
             
-                const hiddenInput = document.getElementById("staff_" + value.replace(/\s+/g, '_'));
+                const hiddenInput = document.getElementById("staff_" + value);
                 if (hiddenInput) {
                     hiddenInput.remove();
                 }
@@ -128,21 +147,29 @@ require_once 'service/Admin_Add_Task.php';
         }
     
         function addHiddenInput(value) {
-            const inputId = "staff_" + value.replace(/\s+/g, '_');
+            const inputId = "staff_" + value;
             const input = document.createElement("input");
             input.type = "hidden";
-            input.name = "assigned_staff[]";
+            input.name = "assigned_staff[]"; 
             input.value = value;
             input.id = inputId;
             hiddenInputsContainer.appendChild(input);
         }
     });
+
     document.getElementById("addTaskForm").addEventListener("submit", function(e) {
         const taskName = document.getElementById("task_name").value.trim();
         const taskDesc = document.getElementById("task_desc").value.trim();
         const startDate = document.getElementById("task_start_date").value;
         const dueDate = document.getElementById("task_due_date").value;
     
+        // Check if any staff is selected
+        const staffInputs = document.querySelectorAll('input[name="assigned_staff[]"]');
+        if (staffInputs.length === 0) {
+            e.preventDefault();
+            alert("Please select at least one staff member");
+            return;
+        }
         if (!taskName || !taskDesc || !startDate || !dueDate) {
             e.preventDefault();
             alert("Please fill in all required fields");
@@ -160,6 +187,5 @@ require_once 'service/Admin_Add_Task.php';
         }
     });
     </script>
-
 </body>
 </html>

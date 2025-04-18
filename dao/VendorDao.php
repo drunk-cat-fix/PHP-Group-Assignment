@@ -234,12 +234,36 @@ class VendorDao {
     public function denyOrder(Vendor $vendor, $reason) {
         $conn = getConnection();
 
-        // Update status to 'Denied' and store the reason
-        $sql = "UPDATE order_product SET status = 'Denied', reason = :reason WHERE order_id = :order_id";
-        $stmt = $conn->prepare($sql);
-        $stmt->bindValue(':order_id', $vendor->getOrderID(), PDO::PARAM_INT);
-        $stmt->bindValue(':reason', $reason, PDO::PARAM_STR);
-        return $stmt->execute();
+        try {
+            // Start transaction
+            $conn->beginTransaction();
+
+            // 1. Update order_product table
+            $sql1 = "UPDATE order_product 
+                     SET status = 'Denied', reason = :reason, isRead = FALSE 
+                     WHERE order_id = :order_id";
+            $stmt1 = $conn->prepare($sql1);
+            $stmt1->bindValue(':order_id', $vendor->getOrderID(), PDO::PARAM_INT);
+            $stmt1->bindValue(':reason', $reason, PDO::PARAM_STR);
+            $stmt1->execute();
+
+            // 2. Update customer_order table
+            $sql2 = "UPDATE customer_order 
+                     SET deliver_status = 'Denied' 
+                     WHERE order_id = :order_id";
+            $stmt2 = $conn->prepare($sql2);
+            $stmt2->bindValue(':order_id', $vendor->getOrderID(), PDO::PARAM_INT);
+            $stmt2->execute();
+
+            // Commit transaction
+            $conn->commit();
+            return true;
+        } catch (PDOException $e) {
+            // Rollback transaction on error
+            $conn->rollBack();
+            error_log("Deny Order Error: " . $e->getMessage());
+            return false;
+        }
     }
 
     public function addService($vendor)

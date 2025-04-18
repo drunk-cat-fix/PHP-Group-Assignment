@@ -157,7 +157,7 @@ class StaffDao {
 
                 if ($result['order_id']) {
                     // Update deliver_date and deliver_status in customer_order table
-                    $sql = "UPDATE customer_order SET deliver_date = ?, deliver_status = 'Arrived' WHERE order_id = ?";
+                    $sql = "UPDATE customer_order SET deliver_date = ?, deliver_status = 'Delivered', isInProgress = FALSE, isDelivered = TRUE, isRead = FALSE WHERE order_id = ?";
                     $stmt = $conn->prepare($sql);
                     $stmt->execute([$today, $result['order_id']]);
                 }

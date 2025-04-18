@@ -34,7 +34,7 @@ class OrderDao
         $sql = "SELECT order_id, order_date, order_time, amount, deliver_date, deliver_percent, deliver_status 
         FROM customer_order 
         WHERE customer_id = ? 
-        ORDER BY order_date DESC";
+        ORDER BY order_id DESC";
         $stmt = getConnection()->prepare($sql);
         $stmt->bindParam(1, $customer_id, PDO::PARAM_INT);
         $stmt->execute();
@@ -66,19 +66,19 @@ class OrderDao
     op.order_product_id,
     op.qty AS ordered_quantity,
     (op.qty * p.product_price) AS item_total_price
-    FROM 
+FROM 
     customer_order co
-    JOIN 
+JOIN 
     order_product op ON co.order_id = op.order_id
-    JOIN 
+JOIN 
     product p ON op.product_id = p.product_id
-    JOIN
+JOIN
     vendor v ON p.product_vendor = v.vendor_id
-    WHERE 
+WHERE 
     co.customer_id = ?
     AND co.order_id = ?
-    ORDER BY 
-    p.product_name";
+ORDER BY 
+    co.order_id DESC";
         $stmt = getConnection()->prepare($sql);
         $stmt->bindParam(1, $customer_id, PDO::PARAM_INT);
         $stmt->bindParam(2, $order_id, PDO::PARAM_INT);

@@ -71,20 +71,22 @@ require_once 'service/Customer_Notification.php';
     </style>
 </head>
 <body>
-    <a href="customer_dashboard.php" class="back-button">← Back to Dashboard</a>
+    <a href="products.php" class="back-button">← Back to Dashboard</a>
     <h2>My Notifications</h2>
-    
-    <?php if (!empty($notifications)): ?>
-        <?php foreach ($notifications as $note): ?>
-            <div class="notification <?= strtolower(str_replace(' ', '-', $note['type'])) ?>">
-                <h4><?= htmlspecialchars($note['type']) ?></h4>
-                <p><?= htmlspecialchars($note['message']) ?></p>
-            </div>
-        <?php endforeach; ?>
-    <?php else: ?>
-        <div class="no-notifications">
-            <p>No new notifications at this time.</p>
-        </div>
+        <?php if (empty($notifications)): ?>
+        <div class="no-notifications">No new notifications 🎉</div>
     <?php endif; ?>
+    <?php foreach ($notifications as $note): ?>
+        <div class="notification <?= strtolower(str_replace(' ', '-', $note['type'])) ?>">
+            <h4><?= htmlspecialchars($note['type']) ?></h4>
+            <p><?= htmlspecialchars($note['message']) ?></p>
+            <form method="post" action="customer_notifications_page.php">
+                <input type="hidden" name="order_id" value="<?= htmlspecialchars($note['order_id']) ?>">
+                <input type="hidden" name="type" value="<?= htmlspecialchars($note['type']) ?>">
+                <button type="submit">Mark as Read</button>
+            </form>
+        </div>
+    <?php endforeach; ?>
+
 </body>
 </html>

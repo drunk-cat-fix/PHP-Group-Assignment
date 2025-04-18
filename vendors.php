@@ -46,10 +46,10 @@ require_once 'service/Vendors.php';
 <div class="vendor-grid">
     <?php foreach ($vendors as $vendor): ?>
         <div class="vendor-card">
-            <a href="shop.php?id=<?= $vendor['vendor_id'] ?>">
+            <a href="shop.php?id=<?= $vendor['vendor_id'] ?><?= !empty($query) ? '&from_search=1' : '' ?>">
                 <img src="<?= isset($vendor['vendor_profile']) ? 'data:image/jpeg;base64,' . base64_encode($vendor['vendor_profile']) : 'path_to_placeholder.jpg' ?>">
             </a>
-            <a href="shop.php?id=<?= $vendor['vendor_id'] ?>">
+            <a href="shop.php?id=<?= $vendor['vendor_id'] ?><?= !empty($query) ? '&from_search=1' : '' ?>">
                 <h3><?= htmlspecialchars($vendor['shop_name']) ?></h3>
             </a>
             <p><?= htmlspecialchars($vendor['vendor_desc']) ?></p>
