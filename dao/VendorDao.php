@@ -138,7 +138,6 @@ class VendorDao {
                 return false;
             }
         
-            // Make sure we're updating to the new quantity value, not reducing by that amount
             $sql = "UPDATE product SET product_qty = :qty WHERE product_id = :id";
             $stmt = $conn->prepare($sql);
         
