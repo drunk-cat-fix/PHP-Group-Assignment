@@ -76,6 +76,7 @@ if ($_POST) {
         $status = $adminDao->isExisted($admin);
 //        print_r($status);
         if ($status) {
+            $_SESSION['admin'] = $status['admin_id'];
             header("location: ../admin_manage_order.php");
         } else {
             header("location: ../login.php?errMsg=Invalid username or password!");

@@ -46,7 +46,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $error = "Passwords do not match.";
     } else {
       $password_hash = password_hash($password, PASSWORD_DEFAULT);
-      $query = "UPDATE vendor SET vendor_name = :vendor_name, vendor_email = :vendor_email, vendor_desc = :vendor_desc, shop_name = :shop_name, shop_address = :shop_address, shop_state = :shop_state, shop_city = :shop_city, vendor_pw = :vendor_pw";
+      $query = "UPDATE vendor SET vendor_name = :vendor_name, vendor_email = :vendor_email, vendor_desc = :vendor_desc,
+                shop_name = :shop_name, shop_address = :shop_address, shop_state = :shop_state, shop_city = :shop_city, vendor_pw = :vendor_pw";
       if ($vendor_profile) {
         $query .= ", vendor_profile = :vendor_profile";
       }
@@ -104,7 +105,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Fetch vendor info
 $conn = getConnection();
-$stmt = $conn->prepare("SELECT vendor_name, vendor_email, shop_name, shop_address, shop_state, vendor_desc, shop_city, vendor_profile FROM vendor WHERE vendor_id = :vendor_id");
+$stmt = $conn->prepare("SELECT vendor_name, vendor_email, shop_name, shop_address, shop_state, vendor_desc, shop_city,
+vendor_profile FROM vendor WHERE vendor_id = :vendor_id");
 $stmt->execute([':vendor_id' => $vendor_id]);
 $vendor = $stmt->fetch(PDO::FETCH_ASSOC);
 ?>

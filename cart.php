@@ -69,13 +69,13 @@ require_once 'service/Cart.php';
             </table>
 
             <div class="buttons-container">
-                <a href="index.php" class="btn continue-btn">← Continue Shopping</a>
+                <a href="products.php" class="btn continue-btn">← Continue Shopping</a>
                 <a href="payment.php" class="btn pay-btn">Proceed to Payment</a>
             </div>
         <?php else: ?>
             <p class="empty-message">Your cart is currently empty.</p>
             <div class="buttons-container">
-                <a href="index.php" class="btn continue-btn">← Continue Shopping</a>
+                <a href="products.php" class="btn continue-btn">← Continue Shopping</a>
             </div>
         <?php endif; ?>
     </div>
