@@ -107,10 +107,10 @@ $searchTerm = isset($_GET['search']) ? trim($_GET['search']) : '';
                 <tr>
                     <th onclick="sortTable(0)">ID</th>
                     <th onclick="sortTable(1)">Name</th>
-                    <th onclick="sortTable(2)">Description</th>
+                    <th>Description</th>
                     <th onclick="sortTable(3)">Category</th>
                     <th onclick="sortTable(4)">Quantity</th>
-                    <th onclick="sortTable(5)">Packaging</th>
+                    <th>Packaging</th>
                     <th onclick="sortTable(6)">Price</th>
                     <th onclick="sortTable(7)">Rating</th>
                 </tr>
