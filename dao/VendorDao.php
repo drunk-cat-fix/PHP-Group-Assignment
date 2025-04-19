@@ -110,14 +110,15 @@ class VendorDao {
 
     public function addProduct($vendor)
     {
-        $sql = "INSERT INTO product (product_name, product_desc, product_category, product_qty, product_packaging, product_price, product_vendor, product_profile) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO product (product_name, product_desc, product_category, product_qty, product_packaging, product_price, product_vendor, 
+                product_profile) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         $productName = $vendor->getProductName();
         $productDesc = $vendor->getProductDesc();
         $productCategory = $vendor->getProductCategory();
         $quantity = $vendor->getQuantity();
         $productPackaging = $vendor->getProductPackaging();
         $price = $vendor->getPrice();
-        $vendor_id = 3;
+        $vendor_id = $vendor->getId();
         $productProfile = $vendor->getProductProfile();        
         $stmt = getConnection()->prepare($sql);
         return $stmt->execute([$productName, $productDesc, $productCategory, $quantity, $productPackaging, $price, $vendor_id, $productProfile]);
