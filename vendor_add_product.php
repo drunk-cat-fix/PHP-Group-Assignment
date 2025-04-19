@@ -1,5 +1,4 @@
 ﻿<?php
-session_start();
 require_once __DIR__ . '\service\Vendor_Add_Product.php';
 require_once 'vendor_nav.php';
 ?>

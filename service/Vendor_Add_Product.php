@@ -1,10 +1,12 @@
 <?php
 use entities\Vendor;
+session_start();
 require_once __DIR__ . '\..\entities\Vendor.php';
 require_once __DIR__ . '\..\dao\VendorDao.php';
 require_once __DIR__ . '\..\Utilities\Connection.php';
 
 $conn = getConnection();
+echo $_SESSION['vendor_id'];
 
 if ($_POST) {
     $vendor = new Vendor();
