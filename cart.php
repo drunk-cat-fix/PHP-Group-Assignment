@@ -1,5 +1,9 @@
 <?php
 session_start();
+if (!isset($_SESSION['customer_id'])) {
+    header("Location: login.php");
+    exit();
+}
 require_once 'nav.php';
 require_once 'service/Cart.php';
 ?>
@@ -44,7 +48,20 @@ require_once 'service/Cart.php';
                 <?php foreach ($productDetails as $item): ?>
                 <tr>
                     <td><?= htmlspecialchars($item['product_name']) ?></td>
-                    <td><?= number_format($item['product_price'], 2) ?></td>
+                    <td>
+                        <?php if ($item['has_promotion']): ?>
+                            <span style="text-decoration: line-through; color: #888;">
+                                RM <?= number_format($item['original_price'], 2) ?>
+                            </span>
+                            <br>
+                            <span style="color: #e53935; font-weight: bold;">
+                                RM <?= number_format($item['product_price'], 2) ?>
+                                (<?= number_format((1 - $item['promotion_factor']) * 100) ?>% OFF)
+                            </span>
+                        <?php else: ?>
+                            RM <?= number_format($item['product_price'], 2) ?>
+                        <?php endif; ?>
+                    </td>
                     <td><?= $item['quantity'] ?></td>
                     <td><?= number_format($item['total'], 2) ?></td>
                     <td>
@@ -67,10 +84,10 @@ require_once 'service/Cart.php';
                     </td>
                 </tr>
             </table>
-
+            
             <div class="buttons-container">
                 <a href="products.php" class="btn continue-btn">← Continue Shopping</a>
-                <a href="payment.php" class="btn pay-btn">Proceed to Payment</a>
+                <a href="checkout.php" class="btn pay-btn">Proceed to Payment →</a>
             </div>
         <?php else: ?>
             <p class="empty-message">Your cart is currently empty.</p>

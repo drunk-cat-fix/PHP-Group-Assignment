@@ -1,5 +1,9 @@
 <?php
 session_start();
+if (!isset($_SESSION['vendor_id'])) {
+    header("Location: login.php");
+    exit();
+}
 require_once 'service/Vendor_Account_Settings.php';
 require_once 'vendor_nav.php';
 ?>

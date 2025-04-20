@@ -29,10 +29,18 @@ $vendor_sql = "SELECT shop_name, shop_address, shop_city, shop_state, vendor_des
 $vendor_stmt = $conn->prepare($vendor_sql);
 $vendor_stmt->execute([':vendor_id' => $vendor_id]);
 $vendor = $vendor_stmt->fetch(PDO::FETCH_ASSOC);
-
 if (!$vendor) {
     die("Vendor not found.");
 }
+
+// Fetch vendor rating
+$vendor_rating_sql = "SELECT AVG(vendor_rating) as avg_rating FROM vendor_review WHERE vendor_id = :vendor_id";
+$vendor_rating_stmt = $conn->prepare($vendor_rating_sql);
+$vendor_rating_stmt->execute([':vendor_id' => $vendor_id]);
+$vendor_rating = $vendor_rating_stmt->fetch(PDO::FETCH_ASSOC);
+
+// Add the rating to vendor array
+$vendor['avg_rating'] = $vendor_rating['avg_rating'] ? number_format($vendor_rating['avg_rating'], 1) : 'No ratings yet';
 
 // Handle search
 $query = $_GET['query'] ?? '';

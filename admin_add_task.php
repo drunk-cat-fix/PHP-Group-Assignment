@@ -2,6 +2,10 @@
 session_start();
 require_once 'admin_nav.php';
 require_once 'service/Admin_Add_Task.php';
+if (!isset($_SESSION['admin_id'])) {
+    header("Location: login.php");
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">

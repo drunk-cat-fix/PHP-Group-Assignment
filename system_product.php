@@ -1,10 +1,13 @@
 ﻿<?php
 session_start();
 require_once 'service/System_Product.php';
-
-if ($_SESSION['admin_id'] != NULL) {
+if (!isset($_SESSION['admin_id']) && !isset($_SESSION['staff_id'])) {
+    header("Location: login.php");
+    exit();
+}
+if (isset($_SESSION['admin_id'])) {
 require_once 'admin_nav.php';
-} else if ($_SESSION['staff_id'] != NULL) {
+} else if (isset($_SESSION['staff_id'])) {
 require_once 'staff_nav.php';
 }
 

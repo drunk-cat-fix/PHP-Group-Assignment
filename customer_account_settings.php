@@ -2,6 +2,10 @@
 session_start();
 require_once 'nav.php';
 require_once 'service/Customer_Account_Settings.php';
+if (!isset($_SESSION['customer_id'])) {
+    header("Location: login.php");
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -51,13 +55,19 @@ require_once 'service/Customer_Account_Settings.php';
       </div>
 
       <div class="form-group">
-        <label for="customerProfile">Profile Picture</label><br>
-        <img id="profilePreview"
-             src="<?= !empty($customer['customer_profile']) ? 'data:image/jpeg;base64,' . base64_encode($customer['customer_profile']) : '#' ?>"
-             style="<?= !empty($customer['customer_profile']) ? '' : 'display:none;' ?>"
-             width="120" height="120" class="mb-3 rounded-circle" alt="Profile Picture">
-        <input type="file" class="form-control-file" id="customerProfile" name="customer_profile" accept="image/*">
-      </div>
+  <label for="customerProfile">Profile Picture</label><br>
+  <img id="profilePreview"
+       src="<?= !empty($customer['customer_profile']) ? 'data:image/jpeg;base64,' . base64_encode($customer['customer_profile']) : '#' ?>"
+       style="<?= !empty($customer['customer_profile']) ? '' : 'display:none;' ?>"
+       width="120" height="120" class="mb-3 rounded-circle" alt="Profile Picture">
+  <div class="mt-2">
+    <div class="custom-file-upload">
+      <input type="file" class="form-control-file" id="customerProfile" name="customer_profile" accept="image/*" style="display: none;">
+      <button type="button" class="btn btn-outline-secondary" id="browseButton">Browse for new image</button>
+      <span id="fileName" class="ml-2"></span>
+    </div>
+  </div>
+</div>
 
       <div class="form-group">
         <label for="customerEmail">Email Address</label>
@@ -108,7 +118,26 @@ require_once 'service/Customer_Account_Settings.php';
         });
       }, false);
     })();
+    document.getElementById('browseButton').addEventListener('click', function() {
+  document.getElementById('customerProfile').click();
+});
 
+document.getElementById('customerProfile').addEventListener('change', function(event) {
+  const file = event.target.files[0];
+  if (file) {
+    // Update the profile preview
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = document.getElementById('profilePreview');
+      img.src = e.target.result;
+      img.style.display = 'inline-block';
+      
+      // Show the selected filename
+      document.getElementById('fileName').textContent = file.name;
+    };
+    reader.readAsDataURL(file);
+  }
+});
     document.getElementById('customerProfile').addEventListener('change', function(event) {
       const file = event.target.files[0];
       if (file) {

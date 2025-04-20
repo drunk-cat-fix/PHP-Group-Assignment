@@ -4,6 +4,10 @@ require_once 'service/Admin_Manage_Order.php';
 require_once 'service/Admin_Notification.php';
 require_once 'admin_nav.php';
 $notificationCount = count($notifications);
+if (!isset($_SESSION['admin_id'])) {
+    header("Location: login.php");
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">

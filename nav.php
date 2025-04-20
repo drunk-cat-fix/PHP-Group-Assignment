@@ -1,4 +1,8 @@
 <?php
+if (!isset($_SESSION['customer_id'])) {
+    header("Location: login.php");
+    exit();
+}
 require_once 'nav_logic.php';
 ?>
 <!DOCTYPE html>
@@ -580,6 +584,12 @@ require_once 'nav_logic.php';
                     <li class="nav-item">
                         <a href="miscellaneous.php" class="nav-link">
                             <i class="fas fa-box"></i> Miscellaneous
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="knowledge_hub.php" class="nav-link">
+                            <i class="fas fa-box"></i> Knowledge Hub
                         </a>
                     </li>
                 </ul>

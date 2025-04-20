@@ -1,13 +1,11 @@
 ﻿<?php
 session_start();
-$vendor_id = 3;
+if (!isset($_SESSION['vendor_id'])) {
+    header("Location: login.php");
+    exit();
+}
 require_once 'service/Vendor_Service.php';
 require_once 'vendor_nav.php';
-/*
-if (!isset($_SESSION['vendor_id'])) {
-    die("Unauthorized access! Please log in.");
-}
-*/
 ?>
 <!DOCTYPE html>
 <html lang="en">

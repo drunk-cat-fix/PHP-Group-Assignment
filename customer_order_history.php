@@ -3,7 +3,10 @@ session_start();
 require_once __DIR__. '/nav.php';
 require_once __DIR__. '/Utilities/Connection.php';
 require_once __DIR__ . '/service/Customer_Order_Operations.php';
-
+if (!isset($_SESSION['customer_id'])) {
+    header("Location: login.php");
+    exit();
+}
 // Get the orders
 $customer_id = $_SESSION['customer_id'];
 $orders = getAllOrderHistory($customer_id);

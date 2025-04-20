@@ -8,7 +8,7 @@ require_once __DIR__ . '/../Utilities/Connection.php';
 $conn = getConnection();
 
 // Fetch tasks
-$sql = "SELECT task_id, task_name, task_desc, task_start_date, task_due_date, task_done_date, order_id FROM task ORDER BY task_id";
+$sql = "SELECT task_id, task_name, task_desc, task_start_date, task_due_date, task_done_date, order_id FROM task ORDER BY task_id DESC";
 $stmt = $conn->prepare($sql);
 $stmt->execute();
 $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC);

@@ -2,6 +2,10 @@
 session_start();
 require_once 'service/Admin_Order_History.php';
 require_once 'admin_nav.php';
+if (!isset($_SESSION['admin_id'])) {
+    header("Location: login.php");
+    exit();
+}
 ?>
 
 <!DOCTYPE html>

@@ -1,10 +1,10 @@
 ﻿<?php
 require_once 'service/Vendor_Product.php';
-require_once 'vendor_nav.php';
-
 if (!isset($_SESSION['vendor_id'])) {
-    die("Unauthorized access! Please log in.");
+    header("Location: login.php");
+    exit();
 }
+require_once 'vendor_nav.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">

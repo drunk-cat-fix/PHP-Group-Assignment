@@ -137,31 +137,30 @@
 
     /* 🚀 表单验证 */
     function validateForm() {
-        var name = document.getElementById("name").value;
-        var username = document.getElementById("username").value;
-        var email = document.getElementById("email").value;
-        var password = document.getElementById("password").value;
-        var role = document.getElementById("role").value;
-        var profile = document.getElementById("profile").files[0];
+    // Remove reference to the non-existent "name" element
+    var username = document.getElementById("username").value;
+    var email = document.getElementById("email").value;
+    var password = document.getElementById("password").value;
+    var role = document.getElementById("role").value;
+    var profile = document.getElementById("profile").files[0];
 
-        if (name === "" || username === "" || email === "" || password === "" || role === "") {
-            alert("❗ Please fill in all fields.");
-            return false;
-        }
-
-        if (!validateEmail(email)) {
-            alert("❗ Invalid email format.");
-            return false;
-        }
-
-        if (!profile) {
-            alert("📸 Please upload a profile picture.");
-            return false;
-        }
-
-        alert("✅ Registration successful!");
-        return true; // 在真实应用中，数据将发送到服务器
+    if (username === "" || email === "" || password === "" || role === "") {
+        alert("❗ Please fill in all fields.");
+        return false;
     }
+
+    if (!validateEmail(email)) {
+        alert("❗ Invalid email format.");
+        return false;
+    }
+
+    if (!profile) {
+        alert("📸 Please upload a profile picture.");
+        return false;
+    }
+
+    return true;
+}
 
     /* 📧 验证 Email 格式 */
     function validateEmail(email) {

@@ -1,6 +1,10 @@
 ﻿<?php
-require_once 'Utilities/Connection.php';
 session_start();
+require_once 'Utilities/Connection.php';
+if (!isset($_SESSION['customer_id'])) {
+    header("Location: login.php");
+    exit();
+}
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

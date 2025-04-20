@@ -232,6 +232,9 @@ $total_amount = 0;
         $firstRow = $order->fetch(PDO::FETCH_ASSOC);
         $order->execute(); // Reset the query to fetch all items again
         
+        // Store the order amount from firstRow
+        $orderAmount = isset($firstRow['amount']) ? $firstRow['amount'] : 0;
+        
         // Check if order exists
         if ($firstRow): 
         ?>
@@ -252,7 +255,7 @@ $total_amount = 0;
                 <div class="order-info-label">Status</div>
                 <div class="order-info-value">
                     <?php
-                    $status = isset($firstRow['order_status']) ? $firstRow['order_status'] : 'Pending';
+                    $status = isset($firstRow['deliver_status']) ? $firstRow['deliver_status'] : 'Pending';
                     $statusClass = 'status-pending';
                     
                     if ($status == 'Delivered') {
@@ -288,7 +291,6 @@ $total_amount = 0;
                     <td>RM <?= number_format($row['product_price'], 2) ?></td>
                     <td><?= htmlspecialchars($row['ordered_quantity']) ?></td>
                     <td>RM <?= number_format($row['item_total_price'], 2) ?></td>
-                    <div hidden="hidden"><?= $total_amount += $row['item_total_price'] ?></div>
                 </tr>
             <?php endwhile; ?>
             </tbody>
@@ -298,8 +300,8 @@ $total_amount = 0;
                     <td>RM <?= number_format($subtotal, 2) ?></td>
                 </tr>
                 <tr class="total-row">
-                    <td colspan="4" style="text-align: right;">Order Total:</td>
-                    <td>RM <?= number_format($total_amount, 2) ?></td>
+                    <td colspan="4" style="text-align: right;">Order Total (after discount):</td>
+                    <td>RM <?= number_format($orderAmount, 2) ?></td>
                 </tr>
             </tfoot>
         </table>

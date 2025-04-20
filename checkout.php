@@ -4,6 +4,10 @@ require_once 'service/Checkout.php';
 require_once 'nav.php';
 $_SESSION['reorder_items'] = $reorderItems;
 $_SESSION['grand_total'] = $grand_total;
+if (!isset($_SESSION['customer_id'])) {
+    header("Location: login.php");
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -48,6 +52,23 @@ $_SESSION['grand_total'] = $grand_total;
         .payment-methods label {
             display: block;
             margin-bottom: 8px;
+        }
+        .price-discount {
+            color: #e53935;
+            font-weight: bold;
+        }
+        .price-original {
+            text-decoration: line-through;
+            color: #888;
+            font-size: 0.9em;
+        }
+        .discount-badge {
+            background-color: #e53935;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            margin-left: 5px;
         }
     </style>
     <script>
@@ -102,7 +123,17 @@ $_SESSION['grand_total'] = $grand_total;
                     <tr>
                         <td><?= htmlspecialchars($item['product_name']) ?></td>
                         <td><?= htmlspecialchars($item['vendor_name']) ?></td>
-                        <td>RM <?= number_format($item['product_price'], 2) ?></td>
+                        <td>
+                            <?php if (isset($item['has_promotion']) && $item['has_promotion']): ?>
+                                <div class="price-original">RM <?= number_format($item['original_price'], 2) ?></div>
+                                <div class="price-discount">
+                                    RM <?= number_format($item['product_price'], 2) ?>
+                                    <span class="discount-badge"><?= number_format((1 - $item['promotion_factor']) * 100) ?>% OFF</span>
+                                </div>
+                            <?php else: ?>
+                                RM <?= number_format($item['product_price'], 2) ?>
+                            <?php endif; ?>
+                        </td>
                         <td><?= $item['ordered_quantity'] ?></td>
                         <td>RM <?= number_format($item['item_total_price'], 2) ?></td>
                     </tr>

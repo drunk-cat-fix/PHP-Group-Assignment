@@ -1,5 +1,9 @@
 <?php
 session_start();
+if (!isset($_SESSION['customer_id'])) {
+    header("Location: login.php");
+    exit();
+}
 require_once 'service/Customer_Complaint.php';
 require_once 'nav.php';
 ?>

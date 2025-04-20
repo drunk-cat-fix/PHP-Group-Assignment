@@ -2,6 +2,10 @@
 session_start();
 require_once 'service/Customer_Notification.php';
 require_once 'nav.php';
+if (!isset($_SESSION['customer_id'])) {
+    header("Location: login.php");
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">

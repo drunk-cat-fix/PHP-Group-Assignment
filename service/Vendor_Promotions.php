@@ -1,7 +1,8 @@
 ﻿<?php
+session_start();
 require_once __DIR__ . '/../Utilities/Connection.php';
 $conn = getConnection();
-$vendor_id = $_SESSION['vendor_id'] ?? null;
+$vendor_id = $_SESSION['vendor_id'];
 
 if (!$vendor_id) {
     die("Unauthorized access.");

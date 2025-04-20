@@ -1,6 +1,9 @@
 ﻿<?php
-session_start();
 require_once __DIR__ . '\service\Vendor_Add_Service.php';
+if (!isset($_SESSION['vendor_id'])) {
+    header("Location: login.php");
+    exit();
+}
 require_once 'vendor_nav.php';
 ?>
 <!DOCTYPE html>

@@ -73,6 +73,7 @@ require_once 'service/Vendor_Notification.php';
     <a href="vendor_product.php">My Products</a>
     <a href="vendor_service.php">My Services</a>
     <a href="vendor_promotions.php">Promotions</a>
+    <a href="vendor_shop_review.php">View Customer Reviews</a>
     <a href="vendor_notifications_page.php" class="notification">
         🔔<span class="badge"><?= $notificationCount ?></span>
     </a>

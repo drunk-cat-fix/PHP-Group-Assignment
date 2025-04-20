@@ -1,5 +1,9 @@
 <?php
 session_start();
+if (!isset($_SESSION['customer_id'])) {
+    header("Location: login.php");
+    exit();
+}
 require_once 'nav.php';
 require_once 'service/Fish.php';
 ?>

@@ -1,5 +1,9 @@
 ﻿<?php
 session_start();
+if (!isset($_SESSION['staff_id'])) {
+    header("Location: login.php");
+    exit();
+}
 require_once 'service/Staff_Dashboard.php';
 require_once 'staff_nav.php';
 ?>

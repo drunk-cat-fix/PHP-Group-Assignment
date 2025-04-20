@@ -22,12 +22,13 @@ if ($_POST) {
         $vendor->setVendorName($_POST['username']);
         $vendor->setVendorEmail($_POST['email']);
         $vendor->setVendorPw($_POST['password']);
-        $target = $_FILES['profile']['tmp_name'];
-        $file = fopen($target, "rb");
-        $size = filesize($target);
-        $content = fread($file, $size);
-        $content = addslashes($content);
-        $vendor->setVendorProfile($content);
+        if (!empty($_FILES['profile']['tmp_name'])) {
+            $target = $_FILES['profile']['tmp_name'];
+            $imageData = file_get_contents($target); // Use file_get_contents instead of fopen/fread
+    
+            // Don't use addslashes on binary data
+            $vendor->setVendorProfile($imageData); // Replace 'entity' with vendor/customer/staff/admin
+        }
         $vendorDao = new VendorDao();
         if ($vendorDao->addVendor($vendor)) {
             header('Location: ../login.php');
@@ -41,12 +42,13 @@ if ($_POST) {
         $customer->setCustomerName($_POST['username']);
         $customer->setCustomerEmail($_POST['email']);
         $customer->setCustomerPw($_POST['password']);
-        $target = $_FILES['profile']['tmp_name'];
-        $file = fopen($target, "rb");
-        $size = filesize($target);
-        $content = fread($file, $size);
-        $content = addslashes($content);
-        $customer->setCustomerProfile($content);
+        if (!empty($_FILES['profile']['tmp_name'])) {
+            $target = $_FILES['profile']['tmp_name'];
+            $imageData = file_get_contents($target); // Use file_get_contents instead of fopen/fread
+    
+            // Don't use addslashes on binary data
+            $customer->setCustomerProfile($imageData); // Replace 'entity' with vendor/customer/staff/admin
+        }
         $customerDao = new CustomerDao();
         if ($customerDao->addCustomer($customer)) {
             header("location: ../login.php");
@@ -60,12 +62,13 @@ if ($_POST) {
         $staff->setStaffName($_POST['username']);
         $staff->setStaffEmail($_POST['email']);
         $staff->setStaffPw($_POST['password']);
-        $target = $_FILES['profile']['tmp_name'];
-        $file = fopen($target, "rb");
-        $size = filesize($target);
-        $content = fread($file, $size);
-        $content = addslashes($content);
-        $staff->setStaffProfile($content);
+        if (!empty($_FILES['profile']['tmp_name'])) {
+            $target = $_FILES['profile']['tmp_name'];
+            $imageData = file_get_contents($target); // Use file_get_contents instead of fopen/fread
+    
+            // Don't use addslashes on binary data
+            $staff->setStaffProfile($imageData); // Replace 'entity' with vendor/customer/staff/admin
+        }
         $staffDao = new StaffDao();
         if ($staffDao->addStaff($staff)) {
             header("location: ../login.php");
@@ -79,13 +82,13 @@ if ($_POST) {
         $admin->setAdminName($_POST['username']);
         $admin->setAdminEmail($_POST['email']);
         $admin->setAdminPw($_POST['password']);
-//        print_r($_FILES['profile']);
-        $target = $_FILES['profile']['tmp_name'];
-        $file = fopen($target, "rb");
-        $size = filesize($target);
-        $content = fread($file, $size);
-        $content = addslashes($content);
-        $admin->setAdminProfile($content);
+        if (!empty($_FILES['profile']['tmp_name'])) {
+            $target = $_FILES['profile']['tmp_name'];
+            $imageData = file_get_contents($target); // Use file_get_contents instead of fopen/fread
+    
+            // Don't use addslashes on binary data
+            $admin->setAdminProfile($imageData); // Replace 'entity' with vendor/customer/staff/admin
+        }
 
 //        print_r($admin->getAdminProfile());
         $adminDao = new AdminDao();

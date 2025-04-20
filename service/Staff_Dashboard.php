@@ -3,9 +3,6 @@ require_once __DIR__ . '/../entities/Staff.php';
 require_once __DIR__ . '/../dao/StaffDao.php';
 require_once __DIR__ . '/../Utilities/Connection.php';
 
-// Use session staff_id if set, otherwise use default for testing
-$_SESSION['staff_id'] = $_SESSION['staff_id'] ?? NULL;
-
 // Handle AJAX requests
 $contentType = isset($_SERVER["CONTENT_TYPE"]) ? trim($_SERVER["CONTENT_TYPE"]) : '';
 if ($contentType === "application/json") {

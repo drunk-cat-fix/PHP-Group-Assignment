@@ -1,7 +1,10 @@
 <?php
-session_start();
 require_once 'service/Vendor_Promotions.php';
 require_once 'vendor_nav.php';
+if (!isset($_SESSION['vendor_id'])) {
+    header("Location: login.php");
+    exit();
+}
 ?>
 
 <!DOCTYPE html>

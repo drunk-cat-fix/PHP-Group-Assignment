@@ -1,6 +1,10 @@
 <?php
 require_once "service/Admin_Task_List.php";
 require_once 'admin_nav.php';
+if (!isset($_SESSION['admin_id'])) {
+    header("Location: login.php");
+    exit();
+}
 ?>
 
 <!DOCTYPE html>

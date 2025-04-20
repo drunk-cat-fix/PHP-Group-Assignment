@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../entities/Vendor.php';
 require_once __DIR__ . '/../dao/VendorDao.php';
 require_once __DIR__ . '/../Utilities/Connection.php';
-
+$vendor_id = $_SESSION['vendor_id'];
 $conn = getConnection();
 $sql = "SELECT service_id, service_name, service_desc, service_category, service_price, service_profile 
         FROM service 

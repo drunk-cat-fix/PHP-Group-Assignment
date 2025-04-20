@@ -1,6 +1,10 @@
 ﻿<?php
 session_start();
 $grand_total = $_SESSION['grand_total'] ?? 0;
+if (!isset($_SESSION['customer_id'])) {
+    header("Location: login.php");
+    exit();
+}
 ?>
 
 <!DOCTYPE html>

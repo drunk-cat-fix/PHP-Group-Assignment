@@ -3,7 +3,10 @@ session_start();
 require_once 'nav.php';
 require_once __DIR__. '/Utilities/Connection.php';
 require_once __DIR__. '/service/Customer_Order_Operations.php';
-
+if (!isset($_SESSION['customer_id'])) {
+    header("Location: login.php");
+    exit();
+}
 // Fetch favorite products
 $products = getAllPreferencesByCusId($_SESSION['customer_id']);
 

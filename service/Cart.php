@@ -2,6 +2,11 @@
 require_once __DIR__ . '/../Utilities/Connection.php';
 $conn = getConnection();
 
+if (!isset($_SESSION['customer_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
 // Initialize the cart session if it doesn't exist
 if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
@@ -36,24 +41,36 @@ $total = 0; // To calculate the total price for all products
 $productDetails = [];
 
 foreach ($_SESSION['cart'] as $product_id => $quantity) {
-    // Fetch product details from DB
-    $sql = "SELECT product_id, product_name, product_price FROM product WHERE product_id = :product_id";
+    // Fetch product details from DB including promotion
+    $sql = "SELECT product_id, product_name, product_price, product_promotion FROM product WHERE product_id = :product_id";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
     $stmt->execute();
     $product = $stmt->fetch(PDO::FETCH_ASSOC);
     
     if ($product) {
+        // Calculate the actual price based on promotion
+        $actualPrice = $product['product_price'];
+        $finalPrice = $actualPrice;
+        
+        // If there's a promotion, apply it
+        if ($product['product_promotion'] && $product['product_promotion'] < 1) {
+            $finalPrice = $actualPrice * $product['product_promotion'];
+        }
+        
         $productDetails[] = [
             'product_id' => $product['product_id'],
             'product_name' => $product['product_name'],
-            'product_price' => $product['product_price'],
+            'product_price' => $finalPrice,
+            'original_price' => $actualPrice,
+            'has_promotion' => ($product['product_promotion'] && $product['product_promotion'] < 1),
+            'promotion_factor' => $product['product_promotion'],
             'quantity' => $quantity,
-            'total' => $product['product_price'] * $quantity
+            'total' => $finalPrice * $quantity
         ];
         
         // Accumulate the total for all products in the cart
-        $total += $product['product_price'] * $quantity;
+        $total += $finalPrice * $quantity;
     }
 }
 ?>

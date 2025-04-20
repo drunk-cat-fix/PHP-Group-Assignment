@@ -2,6 +2,10 @@
 session_start();
 require_once 'nav.php';
 require_once 'service/Crops.php';
+if (!isset($_SESSION['customer_id'])) {
+    header("Location: login.php");
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">

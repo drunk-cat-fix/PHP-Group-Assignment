@@ -1,5 +1,9 @@
 <?php
 session_start();
+if (!isset($_SESSION['customer_id'])) {
+    header("Location: login.php");
+    exit();
+}
 require_once 'nav.php';
 require_once 'service/Shop.php';
 ?>
@@ -448,6 +452,11 @@ require_once 'service/Shop.php';
                         <i class="fas fa-certificate meta-icon"></i>
                         <span class="meta-label">Tier:</span>
                         <span><?= htmlspecialchars($vendor['vendor_tier']) ?></span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-star meta-icon" style="color: var(--yellow);"></i>
+                        <span class="meta-label">Rating:</span>
+                        <span><?= is_numeric($vendor['avg_rating']) ? $vendor['avg_rating'] : 'No ratings yet' ?></span>
                     </div>
                 </div>
                 <div class="vendor-actions">

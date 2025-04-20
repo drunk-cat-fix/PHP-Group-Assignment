@@ -2,6 +2,10 @@
 session_start();
 require_once __DIR__ . '/service/Admin_Manage_Staff.php';
 require_once 'admin_nav.php';
+if (!isset($_SESSION['admin_id'])) {
+    header("Location: login.php");
+    exit();
+}
 if ($_POST) {
     $staff_name = $_POST['staff_name'];
     $staff_email = $_POST['staff_email'];
