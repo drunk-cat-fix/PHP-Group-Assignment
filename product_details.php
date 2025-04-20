@@ -401,10 +401,14 @@ require_once 'nav.php';
                         <span><?= $avg_rating ?>/5</span>
                         <div class="rating-stars">
                             <?php for ($i = 1; $i <= 5; $i++): ?>
-                                <?php if ($i <= floor($avg_rating)): ?>
-                                    <i class="fas fa-star"></i>
-                                <?php elseif ($i - 0.5 <= $avg_rating): ?>
-                                    <i class="fas fa-star-half-alt"></i>
+                                <?php if (is_numeric($avg_rating)): ?>
+                                    <?php if ($i <= floor($avg_rating)): ?>
+                                        <i class="fas fa-star"></i>
+                                    <?php elseif ($i - 0.5 <= $avg_rating): ?>
+                                        <i class="fas fa-star-half-alt"></i>
+                                    <?php else: ?>
+                                        <i class="far fa-star"></i>
+                                    <?php endif; ?>
                                 <?php else: ?>
                                     <i class="far fa-star"></i>
                                 <?php endif; ?>
